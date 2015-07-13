@@ -20,7 +20,30 @@ class ips_plugins_setup_install
 	 */
 	public function step1()
 	{
+		$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/php-antispam/master/cleantalk.class.php');
+		if($file === FALSE)
+		{
+	    	return FALSE;
+		}
+		if(file_put_contents(dirname($_SERVER['SCRIPT_FILENAME'])."/../uploads/cleantalk/cleantalk.class.php" , $file) === FALSE)
+		{
+		    return FALSE;
+		}
 		
+		$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/php-antispam/master/JSON.php');
+		if($file === FALSE)
+		{
+	    	return FALSE;
+		}
+		if(file_put_contents(dirname($_SERVER['SCRIPT_FILENAME'])."/../uploads/cleantalk/JSON.php" , $file) === FALSE)
+		{
+		    return FALSE;
+		}
+		
+		
+		\IPS\Db::i()->query( "CREATE TABLE IF NOT EXISTS cleantalk_timelabels (ct_key varchar(255), ct_value int(11), PRIMARY KEY (ct_key) ) ENGINE=myisam" );
+	    \IPS\Db::i()->query( "CREATE TABLE IF NOT EXISTS cleantalk_server (work_url varchar(255), server_ttl int(11), server_changed int(11) ) ENGINE=myisam" );
+	    \IPS\Db::i()->query( "CREATE TABLE IF NOT EXISTS cleantalk_settings (ct_key varchar(255), ct_value varchar(255), PRIMARY KEY (ct_key) ) ENGINE=myisam" );
 
 		return TRUE;
 	}
