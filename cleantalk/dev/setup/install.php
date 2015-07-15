@@ -25,7 +25,7 @@ class ips_plugins_setup_install
 		{
 	    	return FALSE;
 		}
-		if(file_put_contents(dirname($_SERVER['SCRIPT_FILENAME'])."/../uploads/cleantalk/cleantalk.class.php" , $file) === FALSE)
+		if(file_put_contents(dirname($_SERVER['SCRIPT_FILENAME'])."/../uploads/cleantalk.class.php" , $file) === FALSE)
 		{
 		    return FALSE;
 		}
@@ -35,7 +35,7 @@ class ips_plugins_setup_install
 		{
 	    	return FALSE;
 		}
-		if(file_put_contents(dirname($_SERVER['SCRIPT_FILENAME'])."/../uploads/cleantalk/JSON.php" , $file) === FALSE)
+		if(file_put_contents(dirname($_SERVER['SCRIPT_FILENAME'])."/../uploads/JSON.php" , $file) === FALSE)
 		{
 		    return FALSE;
 		}
