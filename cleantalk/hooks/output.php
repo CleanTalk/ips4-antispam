@@ -4,7 +4,7 @@ class hook12 extends _HOOK_CLASS_
 {
 	public function getTitle( $title )
 	{
-		if(session_status()!=PHP_SESSION_ACTIVE)session_start();
+		if(session_id()=='')session_start();
 		$html = '
 <script type="text/javascript">
 function ctSetCookie(c_name, value, def_value) {
