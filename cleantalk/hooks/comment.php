@@ -71,7 +71,7 @@ abstract class hook13 extends _HOOK_CLASS_
 		    $ct_request->sender_ip = $sender_ip;
 		    $ct_request->sender_email = $sender_email;
 		    $ct_request->post_info = $post_info;
-		    $ct_request->agent = 'ipboard4-15';
+		    $ct_request->agent = 'ipboard4-16';
 		    
 		    $js_keys=Array();
 	        for($i=-5;$i<=1;$i++)

@@ -41,9 +41,9 @@ class ips_plugins_setup_install
 		}
 		
 		
-		\IPS\Db::i()->query( "CREATE TABLE IF NOT EXISTS cleantalk_timelabels (ct_key varchar(255), ct_value int(11), PRIMARY KEY (ct_key) ) ENGINE=myisam" );
-	    \IPS\Db::i()->query( "CREATE TABLE IF NOT EXISTS cleantalk_server (work_url varchar(255), server_ttl int(11), server_changed int(11) ) ENGINE=myisam" );
-	    \IPS\Db::i()->query( "CREATE TABLE IF NOT EXISTS cleantalk_settings (ct_key varchar(255), ct_value varchar(255), PRIMARY KEY (ct_key) ) ENGINE=myisam" );
+		\IPS\Db::i()->query( "CREATE TABLE IF NOT EXISTS cleantalk_timelabels (ct_key varchar(50), ct_value int(11), PRIMARY KEY (ct_key) ) ENGINE=myisam" );
+	    \IPS\Db::i()->query( "CREATE TABLE IF NOT EXISTS cleantalk_server (work_url varchar(50), server_ttl int(11), server_changed int(11) ) ENGINE=myisam" );
+	    \IPS\Db::i()->query( "CREATE TABLE IF NOT EXISTS cleantalk_settings (ct_key varchar(50), ct_value varchar(50), PRIMARY KEY (ct_key) ) ENGINE=myisam" );
 
 		return TRUE;
 	}

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin name="CleanTalk Spam protect" version_long="10000" version_human="1.0.0" author="CleanTalk" website="https://cleantalk.org" update_check=""><hooks><hook type="C" class="\IPS\Member"><![CDATA[//<?php
+<plugin name="CleanTalk Spam protect" version_long="10001" version_human="1.6.0" author="CleanTalk" website="https://cleantalk.org" update_check=""><hooks><hook type="C" class="\IPS\Member"><![CDATA[//<?php
 
 class hook11 extends _HOOK_CLASS_
 {
@@ -97,7 +97,7 @@ class hook11 extends _HOOK_CLASS_
 			    $ct_request->sender_ip = $sender_ip;
 			    $ct_request->sender_email = $sender_email;
 			    $ct_request->post_info = $post_info;
-			    $ct_request->agent = 'ipboard4-15';
+			    $ct_request->agent = 'ipboard4-16';
 			    //$ct_request->js_on = $_COOKIE['ct_checkjs'] == md5(\IPS\Settings::i()->access_key . '+' . \IPS\Settings::i()->email_in) ? 1 : 0;
 			    $ct_request->js_on = in_array($_COOKIE['ct_checkjs'], self::getCheckJSArray()) ? 1 : 0;
 			    $ct_request->submit_time = $submit_time;
@@ -250,7 +250,7 @@ abstract class hook13 extends _HOOK_CLASS_
 			    $ct_request->sender_ip = $sender_ip;
 			    $ct_request->sender_email = $sender_email;
 			    $ct_request->post_info = $post_info;
-			    $ct_request->agent = 'ipboard4-15';
+			    $ct_request->agent = 'ipboard4-16';
 			    
 			    $js_keys=Array();
 		        for($i=-5;$i<=1;$i++)
@@ -319,7 +319,7 @@ if ( $values = $form->values() )
 	return TRUE;
 }
 
-return $form;]]></settingsCode><tasks/><widgets/><htmlFiles/><cssFiles/><jsFiles/><resourcesFiles/><lang><word key="plugin_enabled" js="0">Enable CleanTalk</word><word key="moderate_new" js="0">Moderate new users posts</word><word key="access_key" js="0">Access key</word></lang><versions><version long="10000" human="1.0.0"><![CDATA[//<?php
+return $form;]]></settingsCode><tasks/><widgets/><htmlFiles/><cssFiles/><jsFiles/><resourcesFiles/><lang><word key="plugin_enabled" js="0">Enable CleanTalk</word><word key="moderate_new" js="0">Moderate new users posts</word><word key="access_key" js="0">Access key</word></lang><versions><version long="10001" human="1.6.0"><![CDATA[//<?php
 
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
@@ -330,9 +330,9 @@ if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 }
 
 /**
- * Install Code
+ * 1.6.0 Upgrade Code
  */
-class ips_plugins_setup_install
+class ips_plugins_setup_upg_10001
 {
 	/**
 	 * ...
@@ -341,30 +341,7 @@ class ips_plugins_setup_install
 	 */
 	public function step1()
 	{
-		$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/php-antispam/master/cleantalk.class.php');
-		if($file === FALSE)
-		{
-	    	return FALSE;
-		}
-		if(file_put_contents(dirname($_SERVER['SCRIPT_FILENAME'])."/../uploads/cleantalk.class.php" , $file) === FALSE)
-		{
-		    return FALSE;
-		}
 		
-		$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/php-antispam/master/JSON.php');
-		if($file === FALSE)
-		{
-	    	return FALSE;
-		}
-		if(file_put_contents(dirname($_SERVER['SCRIPT_FILENAME'])."/../uploads/JSON.php" , $file) === FALSE)
-		{
-		    return FALSE;
-		}
-		
-		
-		\IPS\Db::i()->query( "CREATE TABLE IF NOT EXISTS cleantalk_timelabels (ct_key varchar(50), ct_value int(11), PRIMARY KEY (ct_key) ) ENGINE=myisam" );
-	    \IPS\Db::i()->query( "CREATE TABLE IF NOT EXISTS cleantalk_server (work_url varchar(50), server_ttl int(11), server_changed int(11) ) ENGINE=myisam" );
-	    \IPS\Db::i()->query( "CREATE TABLE IF NOT EXISTS cleantalk_settings (ct_key varchar(50), ct_value varchar(50), PRIMARY KEY (ct_key) ) ENGINE=myisam" );
 
 		return TRUE;
 	}
