@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin name="CleanTalk Spam protect" version_long="10001" version_human="1.6.0" author="CleanTalk" website="https://cleantalk.org" update_check=""><hooks><hook type="C" class="\IPS\Member"><![CDATA[//<?php
+<plugin name="CleanTalk Spam protect" version_long="10000" version_human="1.7.0" author="CleanTalk" website="https://cleantalk.org" update_check=""><hooks><hook type="C" class="\IPS\Member"><![CDATA[//<?php
 
-class hook11 extends _HOOK_CLASS_
+class hook13 extends _HOOK_CLASS_
 {
   	public function getCheckJSArray()
 	{
@@ -143,13 +143,14 @@ class hook11 extends _HOOK_CLASS_
 
 }]]></hook><hook type="C" class="\IPS\Output"><![CDATA[//<?php
 
-class hook12 extends _HOOK_CLASS_
+class hook14 extends _HOOK_CLASS_
 {
 	public function getTitle( $title )
 	{
 		try
 		{
 			if(session_id()=='')session_start();
+			$show_link=\IPS\Settings::i()->show_link;
 			$html = '
 	<script type="text/javascript">
 	function ctSetCookie(c_name, value, def_value) {
@@ -160,6 +161,10 @@ class hook12 extends _HOOK_CLASS_
 	';
 			$ct_checkjs_key=md5(\IPS\Settings::i()->access_key . '+' . \IPS\Settings::i()->email_in . date("Ymd",time()));
 			$html = sprintf($html, "ct_checkjs", $ct_checkjs_key, 0);
+			if($show_link==1)
+			{
+				$html.="<div id='cleantalk_footer_link' style='width:100%;text-align:center;'><a href='https://cleantalk.org/ips-cs-4-anti-spam-plugin'>IPS spam</a> blocked by CleanTalk.</div>";
+			}
 			$this->endBodyCode.=$html;
 			return $title;
 		}
@@ -177,7 +182,7 @@ class hook12 extends _HOOK_CLASS_
 	}
 }]]></hook><hook type="C" class="\IPS\Content\Comment"><![CDATA[//<?php
 
-abstract class hook13 extends _HOOK_CLASS_
+abstract class hook15 extends _HOOK_CLASS_
 {
 	public static function create( $item, $comment, $first=FALSE, $guestName=NULL, $incrementPostCount=NULL, $member=NULL, \IPS\DateTime $time=NULL )
 	{
@@ -306,20 +311,107 @@ abstract class hook13 extends _HOOK_CLASS_
 		}
 	}
 	
-}]]></hook></hooks><settings><setting><key>access_key</key><default>0</default></setting><setting><key>plugin_enabled</key><default>0</default></setting><setting><key>moderate_new</key><default>0</default></setting></settings><settingsCode><![CDATA[//<?php
+}]]></hook><hook type="S" class="\IPS\Theme\class_core_admin_global"><![CDATA[//<?php
+
+class hook16 extends _HOOK_CLASS_
+{
+
+/* !Hook Data - DO NOT REMOVE */
+public static function hookData() {
+	$last_check=intval(\IPS\Settings::i()->cleantalk_last_check);
+	$last_status=intval(\IPS\Settings::i()->cleantalk_last_status);
+	
+	$api_key = \IPS\Settings::i()->access_key;
+	$result = '';
+	$html = '';
+	if(time()-$last_check>60) // && $api_key!=0 && $api_key!=''
+	{
+		$data = array();
+		$data['auth_key'] = $api_key;
+		$data['method_name'] = 'notice_validate_key';
+		if(!function_exists('sendRawRequest'))
+		{
+			require_once(dirname($_SERVER['SCRIPT_FILENAME'])."/../uploads/cleantalk.class.php");
+			require_once(dirname($_SERVER['SCRIPT_FILENAME'])."/../uploads/JSON.php");
+		}
+		$result = sendRawRequest('https://api.cleantalk.org',$data);
+		$result = json_decode(trim($result));
+		if(isset($result->valid))
+		{
+			$new_status = intval($result->valid);
+			\IPS\Settings::i()->cleantalk_last_status = $new_status;
+		}
+		else
+		{
+			$new_status = 0;
+		}
+		if($new_status == 1 && $last_status == 0)
+		{
+			\IPS\Settings::i()->cleantalk_show_banner = 1;
+		}
+		\IPS\Settings::i()->cleantalk_last_check = time();
+	}
+	if(isset($_COOKIE['cleantalk_close_banner']))
+	{
+		\IPS\Settings::i()->cleantalk_show_banner = 0;
+	}
+	$show_banner=intval(\IPS\Settings::i()->cleantalk_show_banner);
+	if($show_banner == 1)
+	{
+		$html = "<div style='width:99%;background: #90EE90; padding:10px;border: 2px dashed green;margin:3px;font-size:16px;text-align:center;' id='cleantalk_banner'>Like antispam by CleanTalk? <a href='https://community.invisionpower.com/files/file/7706-anti-spam-ips4/' target='_blank'>Leave a review!</a><div style='float:right;margin-top:-5px;margin-right:-5px;'><a href=# style='text-decoration:none;font-size:14px;font-weight:600;' onclick='jQuery(\"#cleantalk_banner\").hide(\"slow\");document.cookie=\"cleantalk_close_banner = 1;\"'>X</a></div></div>";
+	}
+ return array_merge_recursive( array (
+  'globalTemplate' => 
+  array (
+    0 => 
+    array (
+      'selector' => '#acpPageHeader',
+      'type' => 'add_after',
+      'content' => $html,
+    ),
+  ),
+), parent::hookData() );
+}
+/* End Hook Data */
+
+
+
+
+}]]></hook></hooks><settings><setting><key>access_key</key><default>0</default></setting><setting><key>plugin_enabled</key><default>0</default></setting><setting><key>moderate_new</key><default>0</default></setting><setting><key>show_link</key><default>0</default></setting></settings><settingsCode><![CDATA[//<?php
 
 
 $form->add( new \IPS\Helpers\Form\YesNo( 'plugin_enabled', \IPS\Settings::i()->plugin_enabled, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'plugin_enabled' ) ) );
 $form->add( new \IPS\Helpers\Form\YesNo( 'moderate_new', \IPS\Settings::i()->moderate_new, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'moderate_new' ) ) );
+$form->add( new \IPS\Helpers\Form\YesNo( 'show_link', \IPS\Settings::i()->show_link, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'show_link' ) ) );
 $form->add( new \IPS\Helpers\Form\Text( 'access_key', \IPS\Settings::i()->access_key, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'access_key' ) ) );
 
 if ( $values = $form->values() )
 {
+	require_once(dirname($_SERVER['SCRIPT_FILENAME'])."/../uploads/cleantalk.class.php");
+	require_once(dirname($_SERVER['SCRIPT_FILENAME'])."/../uploads/JSON.php");
+	$values = $form->values();
+	
+	$ct = new \Cleantalk();
+	$ct->work_url = 'http://moderate.cleantalk.ru';
+    $ct->server_url = 'http://moderate.cleantalk.ru';
+    $ct->server_ttl = 43200;
+	
+	$ct_request = new \CleantalkRequest();
+    $ct_request->auth_key = $values['access_key'];
+	$ct_request->sender_nickname = 'CleanTalk';
+    $ct_request->sender_ip = $_SERVER['REMOTE_ADDR'];
+    $ct_request->sender_email = 'good@cleantalk.org';
+    $ct_request->agent = 'ipboard4-17';
+    $ct_request->js_on = 1;
+    $ct_request->message = 'This message is a test to check the connection to the CleanTalk servers.';
+
+    $ct_result = $ct->isAllowMessage($ct_request);
+	
 	$form->saveAsSettings();
 	return TRUE;
 }
 
-return $form;]]></settingsCode><tasks/><widgets/><htmlFiles/><cssFiles/><jsFiles/><resourcesFiles/><lang><word key="plugin_enabled" js="0">Enable CleanTalk</word><word key="moderate_new" js="0">Moderate new users posts</word><word key="access_key" js="0">Access key</word></lang><versions><version long="10001" human="1.6.0"><![CDATA[//<?php
+return $form;]]></settingsCode><tasks/><widgets/><htmlFiles/><cssFiles/><jsFiles/><resourcesFiles/><lang><word key="plugin_enabled" js="0">Enable CleanTalk</word><word key="moderate_new" js="0">Moderate new users posts</word><word key="access_key" js="0">Access key</word><word key="show_link" js="0">Show link to CleanTalk</word></lang><versions><version long="10000" human="1.7.0"><![CDATA[//<?php
 
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
@@ -330,9 +422,9 @@ if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 }
 
 /**
- * 1.6.0 Upgrade Code
+ * Install Code
  */
-class ips_plugins_setup_upg_10001
+class ips_plugins_setup_install
 {
 	/**
 	 * ...
@@ -341,7 +433,30 @@ class ips_plugins_setup_upg_10001
 	 */
 	public function step1()
 	{
+		$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/php-antispam/master/cleantalk.class.php');
+		if($file === FALSE)
+		{
+	    	return FALSE;
+		}
+		if(file_put_contents(dirname($_SERVER['SCRIPT_FILENAME'])."/../uploads/cleantalk.class.php" , $file) === FALSE)
+		{
+		    return FALSE;
+		}
 		
+		$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/php-antispam/master/JSON.php');
+		if($file === FALSE)
+		{
+	    	return FALSE;
+		}
+		if(file_put_contents(dirname($_SERVER['SCRIPT_FILENAME'])."/../uploads/JSON.php" , $file) === FALSE)
+		{
+		    return FALSE;
+		}
+		
+		
+		\IPS\Db::i()->query( "CREATE TABLE IF NOT EXISTS cleantalk_timelabels (ct_key varchar(50), ct_value int(11), PRIMARY KEY (ct_key) ) ENGINE=myisam" );
+	    \IPS\Db::i()->query( "CREATE TABLE IF NOT EXISTS cleantalk_server (work_url varchar(50), server_ttl int(11), server_changed int(11) ) ENGINE=myisam" );
+	    \IPS\Db::i()->query( "CREATE TABLE IF NOT EXISTS cleantalk_settings (ct_key varchar(50), ct_value varchar(50), PRIMARY KEY (ct_key) ) ENGINE=myisam" );
 
 		return TRUE;
 	}

@@ -1,6 +1,6 @@
 //<?php
 
-class hook11 extends _HOOK_CLASS_
+class hook13 extends _HOOK_CLASS_
 {
   	public function getCheckJSArray()
 	{
