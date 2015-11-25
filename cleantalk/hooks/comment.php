@@ -1,6 +1,6 @@
 //<?php
 
-abstract class hook13 extends _HOOK_CLASS_
+abstract class hook15 extends _HOOK_CLASS_
 {
 	public static function create( $item, $comment, $first=FALSE, $guestName=NULL, $incrementPostCount=NULL, $member=NULL, \IPS\DateTime $time=NULL )
 	{
