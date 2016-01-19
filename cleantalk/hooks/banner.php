@@ -11,7 +11,7 @@ public static function hookData() {
 	$api_key = \IPS\Settings::i()->access_key;
 	$result = '';
 	$html = '';
-	if(time()-$last_check>60) // && $api_key!=0 && $api_key!=''
+	if(time()-$last_check>86400 && $api_key!=0 && $api_key!='') // 
 	{
 		$data = array();
 		$data['auth_key'] = $api_key;
