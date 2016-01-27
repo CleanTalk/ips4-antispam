@@ -96,8 +96,8 @@ class hook13 extends _HOOK_CLASS_
 				$ct_request->sender_nickname = $_POST['username'];
 			    $ct_request->sender_ip = $sender_ip;
 			    $ct_request->sender_email = $sender_email;
-			    $ct_request->post_info = $post_info;
-			    $ct_request->agent = 'ipboard4-16';
+			    $ct_request->sender_info = $post_info;
+			    $ct_request->agent = 'ipboard4-18';
 			    //$ct_request->js_on = $_COOKIE['ct_checkjs'] == md5(\IPS\Settings::i()->access_key . '+' . \IPS\Settings::i()->email_in) ? 1 : 0;
 			    $ct_request->js_on = in_array($_COOKIE['ct_checkjs'], self::getCheckJSArray()) ? 1 : 0;
 			    $ct_request->submit_time = $submit_time;
@@ -254,8 +254,8 @@ abstract class hook15 extends _HOOK_CLASS_
 				$ct_request->sender_nickname = $member->name;
 			    $ct_request->sender_ip = $sender_ip;
 			    $ct_request->sender_email = $sender_email;
-			    $ct_request->post_info = $post_info;
-			    $ct_request->agent = 'ipboard4-16';
+			    $ct_request->sender_info = $post_info;
+			    $ct_request->agent = 'ipboard4-18';
 			    
 			    $js_keys=Array();
 		        for($i=-5;$i<=1;$i++)
@@ -324,7 +324,7 @@ public static function hookData() {
 	$api_key = \IPS\Settings::i()->access_key;
 	$result = '';
 	$html = '';
-	if(time()-$last_check>60) // && $api_key!=0 && $api_key!=''
+	if(time()-$last_check>86400 && $api_key!=0 && $api_key!='') // 
 	{
 		$data = array();
 		$data['auth_key'] = $api_key;
