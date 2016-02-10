@@ -71,7 +71,7 @@ abstract class hook15 extends _HOOK_CLASS_
 		    $ct_request->sender_ip = $sender_ip;
 		    $ct_request->sender_email = $sender_email;
 		    $ct_request->sender_info = $post_info;
-		    $ct_request->agent = 'ipboard4-17';
+		    $ct_request->agent = 'ipboard4-18';
 		    
 		    $js_keys=Array();
 	        for($i=-5;$i<=1;$i++)
@@ -84,6 +84,10 @@ abstract class hook15 extends _HOOK_CLASS_
 		    $ct_request->message = $comment;
 	
 		    $ct_result = $ct->isAllowMessage($ct_request);
+		    if(isset($ct_result->errno) && $ct_result->errno>0)
+		    {
+		    	//sendErrorMessage("CleanTalk has some problems, errno is ".$ct_result->errno.", errstr is '".$ct_result->errstr."'")
+		    }
 		    
 		    if($ct_result->allow == 1)
 		    {
