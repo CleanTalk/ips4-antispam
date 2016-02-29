@@ -67,7 +67,14 @@ abstract class hook15 extends _HOOK_CLASS_
 	
 		    $ct_request = new \CleantalkRequest();
 		    $ct_request->auth_key = $config_key;
-			$ct_request->sender_nickname = $member->name;
+		    if(isset($_POST['guest_name']))
+		    {
+		    	$ct_request->sender_nickname = $_POST['guest_name'];
+		    }
+		    else
+		    {
+				$ct_request->sender_nickname = $member->name;
+			}
 		    $ct_request->sender_ip = $sender_ip;
 		    $ct_request->sender_email = $sender_email;
 		    $ct_request->sender_info = $post_info;
