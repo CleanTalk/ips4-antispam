@@ -97,7 +97,7 @@ class hook13 extends _HOOK_CLASS_
 			    $ct_request->sender_ip = $sender_ip;
 			    $ct_request->sender_email = $sender_email;
 			    $ct_request->sender_info = $post_info;
-			    $ct_request->agent = 'ipboard4-18';
+			    $ct_request->agent = 'ipboard4-181';
 			    //$ct_request->js_on = $_COOKIE['ct_checkjs'] == md5(\IPS\Settings::i()->access_key . '+' . \IPS\Settings::i()->email_in) ? 1 : 0;
 			    $ct_request->js_on = in_array($_COOKIE['ct_checkjs'], self::getCheckJSArray()) ? 1 : 0;
 			    $ct_request->submit_time = $submit_time;
@@ -339,7 +339,7 @@ abstract class hook15 extends _HOOK_CLASS_
 			    $ct_request->sender_ip = $sender_ip;
 			    $ct_request->sender_email = $sender_email;
 			    $ct_request->sender_info = $post_info;
-			    $ct_request->agent = 'ipboard4-18';
+			    $ct_request->agent = 'ipboard4-181';
 			    
 			    $js_keys=Array();
 		        for($i=-5;$i<=1;$i++)
@@ -527,7 +527,7 @@ if ( $values = $form->values() )
 	$ct_request->sender_nickname = 'CleanTalk';
     $ct_request->sender_ip = $_SERVER['REMOTE_ADDR'];
     $ct_request->sender_email = 'good@cleantalk.org';
-    $ct_request->agent = 'ipboard4-18';
+    $ct_request->agent = 'ipboard4-181';
     $ct_request->js_on = 1;
     $ct_request->message = 'This message is a test to check the connection to the CleanTalk servers.';
 
