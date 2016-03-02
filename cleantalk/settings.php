@@ -34,7 +34,14 @@ function CleantalkGetIP()
 $form->add( new \IPS\Helpers\Form\YesNo( 'plugin_enabled', \IPS\Settings::i()->plugin_enabled, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'plugin_enabled' ) ) );
 $form->add( new \IPS\Helpers\Form\YesNo( 'moderate_new', \IPS\Settings::i()->moderate_new, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'moderate_new' ) ) );
 $form->add( new \IPS\Helpers\Form\YesNo( 'show_link', \IPS\Settings::i()->show_link, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'show_link' ) ) );
-$form->add( new \IPS\Helpers\Form\YesNo( 'cleantalk_sfw', \IPS\Settings::i()->cleantalk_sfw, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'cleantalk_sfw' ) ) );
+if(file_exists(dirname($_SERVER['SCRIPT_FILENAME'])."/../uploads/cleantalk-sfw.class.php"))
+{
+	$form->add( new \IPS\Helpers\Form\YesNo( 'cleantalk_sfw', \IPS\Settings::i()->cleantalk_sfw, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'cleantalk_sfw' ) ) );
+}
+else
+{
+	$form->addHeader('Please, delete plugin completely and install again to enable Spam FireWall feature');
+}
 $form->add( new \IPS\Helpers\Form\Text( 'access_key', \IPS\Settings::i()->access_key, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'access_key' ) ) );
 
 if ( $values = $form->values() )
@@ -53,7 +60,7 @@ if ( $values = $form->values() )
 	$ct_request->sender_nickname = 'CleanTalk';
     $ct_request->sender_ip = $_SERVER['REMOTE_ADDR'];
     $ct_request->sender_email = 'good@cleantalk.org';
-    $ct_request->agent = 'ipboard4-17';
+    $ct_request->agent = 'ipboard4-18';
     $ct_request->js_on = 1;
     $ct_request->message = 'This message is a test to check the connection to the CleanTalk servers.';
 
