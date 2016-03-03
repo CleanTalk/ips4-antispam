@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin name="CleanTalk Spam protect" version_long="10000" version_human="1.7.0" author="CleanTalk" website="https://cleantalk.org" update_check=""><hooks><hook type="C" class="\IPS\Member"><![CDATA[//<?php
+<plugin name="CleanTalk Spam protect" version_long="18000" version_human="1.8.1" author="CleanTalk" website="https://cleantalk.org" update_check=""><hooks><hook type="C" class="\IPS\Member"><![CDATA[//<?php
 
 class hook13 extends _HOOK_CLASS_
 {
