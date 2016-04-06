@@ -14,7 +14,7 @@ abstract class hook15 extends _HOOK_CLASS_
 			$comment=$_POST['topic_title']."\n".$comment;
 		}
 		$access_key=\IPS\Settings::i()->access_key;
-		if(!$member->isAdmin() && $member->member_posts<=10 && \IPS\Settings::i()->moderate_new==1)
+		if(isset($member) && !$member->isAdmin() && $member->member_posts<=10 && \IPS\Settings::i()->moderate_new==1)
 		{
 			require_once(dirname($_SERVER['SCRIPT_FILENAME'])."/uploads/cleantalk.class.php");
 			require_once(dirname($_SERVER['SCRIPT_FILENAME'])."/uploads/JSON.php");
