@@ -883,7 +883,7 @@ $html="<center><a href=\"#\" id=\"check_spam\" onclick=\"$.ajax({type: 'POST', u
 			 */
 			public function step1(){
 
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/cleantalk.class.php');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/cleantalk.class.php');
 				if($file === FALSE){
 					return FALSE;
 				}
@@ -891,7 +891,7 @@ $html="<center><a href=\"#\" id=\"check_spam\" onclick=\"$.ajax({type: 'POST', u
 					return FALSE;
 				}
 				
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/JSON.php');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/JSON.php');
 				if($file === FALSE){
 					return FALSE;
 				}
@@ -899,7 +899,7 @@ $html="<center><a href=\"#\" id=\"check_spam\" onclick=\"$.ajax({type: 'POST', u
 					return FALSE;
 				}
 				
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/cleantalk-sfw.class.php');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/cleantalk-sfw.class.php');
 				if($file === FALSE){
 					return FALSE;
 				}
@@ -907,21 +907,21 @@ $html="<center><a href=\"#\" id=\"check_spam\" onclick=\"$.ajax({type: 'POST', u
 					return FALSE;
 				}
 				
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/sfw_die_page.html');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/sfw_die_page.html');
 				if($file === FALSE){
 					return FALSE;
 				}
 				if(file_put_contents(\IPS\ROOT_PATH."/uploads/sfw_die_page.html" , $file) === FALSE){
 					return FALSE;
 				}
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/mcheck.php');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/mcheck.php');
 				if($file === FALSE){
 					return FALSE;
 				}
 				if(file_put_contents(\IPS\ROOT_PATH."/uploads/mcheck.php" , $file) === FALSE){
 					return FALSE;
 				}
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/updatedb.php');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/updatedb.php');
 				if($file === FALSE){
 					return FALSE;
 				}
