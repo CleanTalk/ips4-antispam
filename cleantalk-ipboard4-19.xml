@@ -883,7 +883,7 @@ $html="<center><a href=\"#\" id=\"check_spam\" onclick=\"$.ajax({type: 'POST', u
 			 */
 			public function step1(){
 
-				$file = file_get_contents('http://download.cleantalk.org/base/ips4_187/cleantalk.class.php');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/cleantalk.class.php');
 				if($file === FALSE){
 					return FALSE;
 				}
@@ -891,7 +891,7 @@ $html="<center><a href=\"#\" id=\"check_spam\" onclick=\"$.ajax({type: 'POST', u
 					return FALSE;
 				}
 				
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/php-antispam/master/JSON.php');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/JSON.php');
 				if($file === FALSE){
 					return FALSE;
 				}
