@@ -280,7 +280,7 @@
 						$ct_checkjs_key = md5(\IPS\Settings::i()->access_key . '+' . \IPS\Settings::i()->email_in . date("Ymd",time()));
 						$html = sprintf($html, $ct_checkjs_key);
 						if($show_link==1)
-							$html.="<div id='cleantalk_footer_link' style='width:100%;text-align:center;'><a href='https://cleantalk.org/'>IPS spam</a> blocked by CleanTalk.</div>";
+							$html.="<div id='cleantalk_footer_link' style='width:100%;text-align:center;'><a href='https://cleantalk.org/ips-cs-4-anti-spam-plugin'>IPS spam</a> blocked by CleanTalk.</div>";
 						
 						$this->endBodyCode.=$html;
 						return $title;
@@ -499,45 +499,13 @@
 
 				/* !Hook Data - DO NOT REMOVE */
 				public static function hookData() {
-					
-					$last_check=intval(\IPS\Settings::i()->cleantalk_last_check);
-					$last_status=intval(\IPS\Settings::i()->cleantalk_last_status);
-					
-					$api_key = \IPS\Settings::i()->access_key;
-					$result = '';
 					$html = '';
-					if(time()-$last_check>86400 && $api_key!=0 && $api_key!=''){
-						
-						$data = array();
-						$data['auth_key'] = $api_key;
-						$data['method_name'] = 'notice_validate_key';
-						
-						if(!function_exists('sendRawRequest')){
-							require_once(\IPS\ROOT_PATH."/uploads/cleantalk.class.php");
-							require_once(\IPS\ROOT_PATH."/uploads/JSON.php");
-						}
-						
-						$result = sendRawRequest('https://api.cleantalk.org',$data);
-						$result = json_decode(trim($result));
-						
-						if(isset($result->valid)){
-							$new_status = intval($result->valid);
-							\IPS\Settings::i()->cleantalk_last_status = $new_status;
-						}else{
-							$new_status = 0;
-						}
-						
-						if($new_status == 1 && $last_status == 0)
-							\IPS\Settings::i()->cleantalk_show_banner = 1;
-						
-						\IPS\Settings::i()->cleantalk_last_check = time();
-					}
 					if(isset($_COOKIE['cleantalk_close_banner']))
 						\IPS\Settings::i()->cleantalk_show_banner = 0;
 					
 					$show_banner=intval(\IPS\Settings::i()->cleantalk_show_banner);
 					if($show_banner == 1)
-						$html = "<div style='width:99%;background: #90EE90; padding:10px;border: 2px dashed green;margin:3px;font-size:16px;text-align:center;' id='cleantalk_banner'>Like antispam by CleanTalk? <a href='https://community.invisionpower.com/files/file/7706-anti-spam-ips4/' target='_blank'>Leave a review!</a><div style='float:right;margin-top:-5px;margin-right:-5px;'><a href=# style='text-decoration:none;font-size:14px;font-weight:600;' onclick='jQuery(\"#cleantalk_banner\").hide(\"slow\");document.cookie=\"cleantalk_close_banner = 1;\"'>X</a></div></div>";
+						$html = "<div style='width:99%;background: #90EE90; padding:10px;border: 2px dashed green;margin:3px;font-size:16px;text-align:center;' id='cleantalk_banner'>Like antispam by CleanTalk? <a href='https://community.invisionpower.com/files/file/7706-anti-spam-ips4/' target='_blank'>Leave a review!</a><div style='float:right;margin-top:-5px;margin-right:-5px;'><a href=# style='text-decoration:none;font-size:14px;font-weight:600;' onclick='jQuery(\"#cleantalk_banner\").hide(\"slow\");document.cookie=\"cleantalk_close_banner = 1; path=/; expires= Fri, 31 Dec 9999 23:59:59 GMT\";'>X</a></div></div>";
 					
 					return array_merge_recursive(array (
 						'globalTemplate' => 
@@ -770,16 +738,17 @@
 		$form->add( new \IPS\Helpers\Form\YesNo( 'show_link', \IPS\Settings::i()->show_link, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'show_link' ) ) );
 		$form->add( new \IPS\Helpers\Form\YesNo( 'cleantalk_sfw', (($sfw_file_ok && $sfw_table_ok) ? \IPS\Settings::i()->cleantalk_sfw : 0), FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'cleantalk_sfw', 'disabled' => !$sfw_file_ok ) ) );
 		$form->add( new \IPS\Helpers\Form\Number( 'posts_to_check', (empty(\IPS\Settings::i()->posts_to_check) ? 10 : \IPS\Settings::i()->posts_to_check), FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'posts_to_check', 'min' => 1, 'max' => 10000) ) );
-		$form->add( new \IPS\Helpers\Form\Text( 'access_key', (empty(\IPS\Settings::i()->access_key) ? NULL : \IPS\Settings::i()->access_key), FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'access_key', 'placeholder' => 'Enter the key') ) );
+		$form->add( new \IPS\Helpers\Form\Text( 'access_key', (empty(\IPS\Settings::i()->access_key) ? NULL : \IPS\Settings::i()->access_key), FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'access_key', 'placeholder' => 'Enter the key') ) );						
+		//Check users
 		$select = \IPS\Db::i()->select( 'member_id,name,email,ip_address,joined,last_visit','core_members');
-$select = $select->setKeyField( 'member_id' );
-$users = array();
-foreach( $select as $member_id => $value )
-{
-    $users[] = $value;
+		$select = $select->setKeyField( 'member_id' );
+		$users = array();
+		foreach( $select as $member_id => $value )
+		{
+		    $users[] = $value;
 
-}	
-$html="<center><a href=\"#\" id=\"check_spam\" onclick=\"$.ajax({type: 'POST', url: 'http://".$_SERVER['SERVER_NAME']."/uploads/mcheck.php', data: '" . http_build_query(array('users' => $users)) . "&key=".(empty(\IPS\Settings::i()->access_key) ? NULL : base64_encode(\IPS\Settings::i()->access_key))."', success: function(data){ $('#results').html(data);}});\">Check users for spam</a></center>";
+		}	
+		$html="<center><a href=\"#\" id=\"check_spam\" onclick=\"$.ajax({type: 'POST', url: 'http://".$_SERVER['SERVER_NAME']."/uploads/mcheck.php', data: '" . http_build_query(array('users' => $users)) . "&key=".(empty(\IPS\Settings::i()->access_key) ? NULL : base64_encode(\IPS\Settings::i()->access_key))."', success: function(data){ $('#results').html(data);}});\">Check users for spam</a></center>";
 		$html.="<div id=\"results\"></div>";
 		$form->addHtml($html);
 		if ( $values = $form->values() ){
@@ -858,8 +827,27 @@ $html="<center><a href=\"#\" id=\"check_spam\" onclick=\"$.ajax({type: 'POST', u
 					$values['cleantalk_sfw'] = FALSE;
 				}
 			}
-			$form->saveAsSettings($values);
-			return TRUE;
+			$data = array();
+			$data['auth_key'] = $_POST['access_key'];
+			$data['method_name'] = 'notice_validate_key';				
+			if(!function_exists('sendRawRequest')){
+				require_once(\IPS\ROOT_PATH."/uploads/cleantalk.class.php");
+				require_once(\IPS\ROOT_PATH."/uploads/JSON.php");
+			}
+			if (!empty($data['auth_key'])){
+				$result = sendRawRequest('https://api.cleantalk.org',$data);
+				$result = json_decode(trim($result));
+				if ($result->valid === 1)
+				{
+					$form->saveAsSettings($values);
+					return TRUE;				
+				}
+				else 
+				{
+					throw new \InvalidArgumentException("Cleantalk - Wrong access key.");
+				}		
+			}
+
 		}
 
 		return $form;]]></settingsCode><tasks/><widgets/><htmlFiles/><cssFiles/><jsFiles/><resourcesFiles/><lang><word key="plugin_enabled" js="0">Enable CleanTalk</word><word key="ct_contact_form_check" js="0">Protect contact form</word><word key="moderate_new" js="0">Moderate new users posts</word><word key="access_key" js="0">Access key</word><word key="posts_to_check" js="0">Do not check users with posts more than</word><word key="show_link" js="0">Show link to CleanTalk</word><word key="cleantalk_sfw" js="0">Enable SpamFireWall</word></lang><versions><version long="10000" human="1.7.0"><![CDATA[//<?php
