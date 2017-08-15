@@ -844,7 +844,7 @@
 				}
 				else 
 				{
-		 			\IPS\Output::i()->error( '', 'Cleantalk error - Wrong access key!', 1 );
+		 			\IPS\Output::i()->error( '', 'Cleantalk error - Wrong access key!', 1, '');
 					return false;
 				}		
 			}
