@@ -1,0 +1,966 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin name="CleanTalk Spam protect" version_long="18900" version_human="1.8.9" author="CleanTalk" website="https://cleantalk.org" update_check=""><hooks><hook type="C" class="\IPS\Member" filename="registration"><![CDATA[//<?php
+
+			class hook13 extends _HOOK_CLASS_{
+				
+				public function getCheckJSArray(){
+					try{
+						
+						$result=Array();
+						
+						for($i=-5;$i<=1;$i++){
+							$result[]=md5(\IPS\Settings::i()->access_key . '+' . \IPS\Settings::i()->email_in . date("Ymd",time()+86400*$i));
+						}
+						
+						return $result;
+					}
+					catch ( \RuntimeException $e ){
+						
+						if ( method_exists( get_parent_class(), __FUNCTION__ ) )
+							return call_user_func_array( 'parent::' . __FUNCTION__, func_get_args() );
+						else
+							throw $e;
+					}
+				}
+
+				/**
+				 * [ActiveRecord] Save Changed Columns
+				 *
+				 * @return	void
+				 * @note	We have to be careful when upgrading in case we are coming from an older version
+				 */
+				public function save(){
+					
+					try{
+						
+						$new		= $this->_new;
+						$enabled=\IPS\Settings::i()->plugin_enabled;
+						$access_key=\IPS\Settings::i()->access_key;
+						if($enabled==1&&$new){
+							
+							require_once(\IPS\ROOT_PATH."/uploads/cleantalk.class.php");
+							require_once(\IPS\ROOT_PATH."/uploads/JSON.php");
+							
+							session_name('cleantalksession');
+							
+							if (!isset($_SESSION))
+								session_start();
+							
+							if (array_key_exists('formtime', $_SESSION))
+								$submit_time = time() - (int) $_SESSION['formtime'];
+							else
+								$submit_time = NULL;
+							
+							$_SESSION['formtime'] = time();
+					
+							$post_info = '';
+							$lang=\IPS\Lang::getEnabledLanguages();
+							$locale=$lang[\IPS\Lang::defaultLanguage()]->short;
+							
+							// Pointer data
+							$pointer_data = (isset($_COOKIE['ct_pointer_data']) ? json_decode ($_COOKIE['ct_pointer_data']) : 0);				
+							// Timezone from JS
+							$js_timezone = 	(isset($_COOKIE['ct_timezone']) ? $_COOKIE['ct_timezone'] : 0);
+							//First key down timestamp
+							$first_key_press_timestamp = isset($_COOKIE['ct_fkp_timestamp']) ? $_COOKIE['ct_fkp_timestamp'] : 0;
+							// Page opened timestamp
+							$page_set_timestamp = (isset($_COOKIE['ct_ps_timestamp']) ? $_COOKIE['ct_ps_timestamp'] : 0);
+							
+							if(function_exists('json_encode')){					
+								$arr = array(
+									'cms_lang' => $locale,
+									'REFFERRER' => $_SERVER['HTTP_REFERER'],
+									'USER_AGENT' => $_SERVER['HTTP_USER_AGENT'],
+									'mouse_cursor_positions' => $pointer_data,
+									'js_timezone' => $js_timezone,
+									'key_press_timestamp' => $first_key_press_timestamp,
+									'page_set_timestamp' => $page_set_timestamp
+								);
+								$post_info = json_encode($arr);
+							}
+							if($post_info === FALSE)
+								$post_info = '';
+							
+							$ct_url = 'http://moderate.cleantalk.org';
+							
+							$config_work_url =  $ct_url;
+							$config_ttl = 43200;
+							$config_changed = 1349162987;
+					
+							$config_key = $access_key;
+							
+							$ct = new \Cleantalk();
+							$ct->work_url = $config_work_url;
+							$ct->server_url = $ct_url;
+							$ct->server_ttl = $config_ttl;
+							$ct->server_changed = $config_changed;
+					
+							$sender_email = filter_var($_POST['email_address'], FILTER_SANITIZE_EMAIL);
+							$sender_ip = $ct->ct_session_ip($_SERVER['REMOTE_ADDR']);
+					
+							$ct_request = new \CleantalkRequest();
+							$ct_request->auth_key = $config_key;
+							$ct_request->sender_nickname = $_POST['username'];
+							$ct_request->sender_ip = $sender_ip;
+							$ct_request->sender_email = $sender_email;
+							$ct_request->sender_info = $post_info;
+							$ct_request->agent = 'ipboard4-189';
+							//$ct_request->js_on = $_COOKIE['ct_checkjs'] == md5(\IPS\Settings::i()->access_key . '+' . \IPS\Settings::i()->email_in) ? 1 : 0;
+							$ct_request->js_on = in_array($_COOKIE['ct_checkjs'], self::getCheckJSArray()) ? 1 : 0;
+							$ct_request->submit_time = $submit_time;
+							$ct_result = $ct->isAllowUser($ct_request);
+							if(isset($ct_result->errno) && $ct_result->errno>0){
+								//sendErrorMessage("CleanTalk has some problems, errno is ".$ct_result->errno.", errstr is '".$ct_result->errstr."'")
+							}
+							
+							if($ct_result->allow == 1)
+								call_user_func_array( 'parent::save', func_get_args() );
+							else{
+								// Spammer - display message and exit.
+								
+								if ( \IPS\Request::i()->isAjax() ){
+									$err_str = '<span style="color:#ab1f39;">' . $ct_result->comment . '</span><script>setTimeout("history.back()", 5000);</script>';
+									print $err_str;
+								}else{
+									\IPS\Output::i()->sidebar['enabled'] = FALSE;
+									\IPS\Output::i()->sendOutput(
+										\IPS\Theme::i()->getTemplate( 'global', 'core' )->globalTemplate(
+											"Forbidden",
+											\IPS\Theme::i()->getTemplate( 'global', 'core' )->error( "Forbidden", $ct_result->comment, 1, "" ),
+											array( 
+												'app' => \IPS\Dispatcher::i()->application ? \IPS\Dispatcher::i()->application->directory : NULL,
+												'module' => \IPS\Dispatcher::i()->module ? \IPS\Dispatcher::i()->module->key : NULL,
+												'controller' => \IPS\Dispatcher::i()->controller 
+											) 
+										), 
+										200, 
+										'text/html', 
+										Array(),
+										FALSE,
+										FALSE 
+									);
+								}
+								die();
+							}
+						}
+						return call_user_func_array( 'parent::save', func_get_args() );
+					}
+					catch ( \RuntimeException $e ){
+						
+						if ( method_exists( get_parent_class(), __FUNCTION__ ) )
+							return call_user_func_array( 'parent::' . __FUNCTION__, func_get_args() );
+						else
+							throw $e;
+					}
+				}
+
+			}]]></hook><hook type="C" class="\IPS\Output" filename="sfw_js"><![CDATA[//<?php
+
+			class hook14 extends _HOOK_CLASS_{
+				
+				public function getTitle( $title ){
+					
+					try{
+						
+						if(\IPS\Settings::i()->cleantalk_sfw == 1 && file_exists(\IPS\ROOT_PATH."/uploads/cleantalk-sfw.class.php") && \IPS\Db::i()->checkForTable('cleantalk_sfw')){
+							
+							$is_sfw_check=true;
+							$ip=$this->CleantalkGetIP();
+							$ip=array_unique($ip);
+							$key=\IPS\Settings::i()->access_key;
+							for($i=0;$i<sizeof($ip);$i++){
+								
+								if(isset($_COOKIE['ct_sfw_pass_key']) && $_COOKIE['ct_sfw_pass_key']==md5($ip[$i].$key)){
+									
+									$is_sfw_check=false;
+									
+									if(isset($_COOKIE['ct_sfw_passed']))
+										@setcookie ('ct_sfw_passed', '0', 1, "/");
+								}
+							}
+							if($is_sfw_check){
+								
+								include_once(\IPS\ROOT_PATH."/uploads/cleantalk-sfw.class.php");
+								$sfw = new \CleanTalkSFW();
+								$sfw->cleantalk_get_real_ip();
+								$sfw->check_ip();
+								if($sfw->result)
+									$sfw->sfw_die();
+							}
+						}
+						
+						if(session_id()=='')
+							session_start();
+						
+						$show_link=\IPS\Settings::i()->show_link;
+						$html = '
+							<script type="text/javascript">
+								function ctSetCookie(c_name, value) {
+									document.cookie = c_name + "=" + encodeURIComponent(value) + "; path=/";
+								}
+
+								ctSetCookie("ct_ps_timestamp", Math.floor(new Date().getTime()/1000));
+								ctSetCookie("ct_fkp_timestamp", "0");
+								ctSetCookie("ct_pointer_data", "0");
+								ctSetCookie("ct_timezone", "0");
+
+								setTimeout(function(){
+									ctSetCookie("ct_checkjs", "%s");
+									ctSetCookie("ct_timezone", d.getTimezoneOffset()/60*(-1));
+								},1000);
+
+								//Stop observing function
+								function ctMouseStopData(){
+									if(typeof window.addEventListener == "function")
+										window.removeEventListener("mousemove", ctFunctionMouseMove);
+									else
+										window.detachEvent("onmousemove", ctFunctionMouseMove);
+									clearInterval(ctMouseReadInterval);
+									clearInterval(ctMouseWriteDataInterval);				
+								}
+
+								//Stop key listening function
+								function ctKeyStopStopListening(){
+									if(typeof window.addEventListener == "function"){
+										window.removeEventListener("mousedown", ctFunctionFirstKey);
+										window.removeEventListener("keydown", ctFunctionFirstKey);
+									}else{
+										window.detachEvent("mousedown", ctFunctionFirstKey);
+										window.detachEvent("keydown", ctFunctionFirstKey);
+									}
+									clearInterval(ctMouseReadInterval);
+									clearInterval(ctMouseWriteDataInterval);				
+								}
+
+								var d = new Date(), 
+									ctTimeMs = new Date().getTime(),
+									ctMouseEventTimerFlag = true, //Reading interval flag
+									ctMouseData = "[",
+									ctMouseDataCounter = 0;
+									
+								//Reading interval
+								var ctMouseReadInterval = setInterval(function(){
+										ctMouseEventTimerFlag = true;
+									}, 300);
+									
+								//Writting interval
+								var ctMouseWriteDataInterval = setInterval(function(){ 
+										var ctMouseDataToSend = ctMouseData.slice(0,-1).concat("]");
+										ctSetCookie("ct_pointer_data", ctMouseDataToSend);
+									}, 1200);
+
+								//Logging mouse position each 300 ms
+								var ctFunctionMouseMove = function output(event){
+									if(ctMouseEventTimerFlag == true){
+										var mouseDate = new Date();
+										ctMouseData += "[" + event.pageY + "," + event.pageX + "," + (mouseDate.getTime() - ctTimeMs) + "],";
+										ctMouseDataCounter++;
+										ctMouseEventTimerFlag = false;
+										if(ctMouseDataCounter >= 100)
+											ctMouseStopData();
+									}
+								}
+								//Writing first key press timestamp
+								var ctFunctionFirstKey = function output(event){
+									var KeyTimestamp = Math.floor(new Date().getTime()/1000);
+									ctSetCookie("ct_fkp_timestamp", KeyTimestamp);
+									ctKeyStopStopListening();
+								}
+
+								if(typeof window.addEventListener == "function"){
+									window.addEventListener("mousemove", ctFunctionMouseMove);
+									window.addEventListener("mousedown", ctFunctionFirstKey);
+									window.addEventListener("keydown", ctFunctionFirstKey);
+								}else{
+									window.attachEvent("onmousemove", ctFunctionMouseMove);
+									window.attachEvent("mousedown", ctFunctionFirstKey);
+									window.attachEvent("keydown", ctFunctionFirstKey);
+								}
+							</script>';
+						$ct_checkjs_key = md5(\IPS\Settings::i()->access_key . '+' . \IPS\Settings::i()->email_in . date("Ymd",time()));
+						$html = sprintf($html, $ct_checkjs_key);
+						if($show_link==1)
+							$html.="<div id='cleantalk_footer_link' style='width:100%;text-align:center;'><a href='https://cleantalk.org/'>IPS spam</a> blocked by CleanTalk.</div>";
+						
+						$this->endBodyCode.=$html;
+						return $title;
+					}
+					catch ( \RuntimeException $e ){
+						
+						if ( method_exists( get_parent_class(), __FUNCTION__ ) )
+							return call_user_func_array( 'parent::' . __FUNCTION__, func_get_args() );
+						else
+							throw $e;
+					}
+				}
+				
+				public function CleantalkGetIP(){
+					try{
+						$result=Array();
+						
+						if ( function_exists( 'apache_request_headers' ) )
+							$headers = apache_request_headers();
+						else
+							$headers = $_SERVER;
+
+						if ( array_key_exists( 'X-Forwarded-For', $headers ) ){
+							$the_ip=explode(",", trim($headers['X-Forwarded-For']));
+							$result[] = trim($the_ip[0]);
+						}
+						
+						if ( array_key_exists( 'HTTP_X_FORWARDED_FOR', $headers )){
+							$the_ip=explode(",", trim($headers['HTTP_X_FORWARDED_FOR']));
+							$result[] = trim($the_ip[0]);
+						}
+						
+						$result[] = filter_var( $_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 );
+					
+						if(isset($_GET['sfw_test_ip']))
+							$result[]=$_GET['sfw_test_ip'];
+						
+						return $result;
+					}
+					catch ( \RuntimeException $e ){			
+						if ( method_exists( get_parent_class(), __FUNCTION__ ) )
+							return call_user_func_array( 'parent::' . __FUNCTION__, func_get_args() );
+						else
+							throw $e;
+					}
+				}
+			}]]></hook><hook type="C" class="\IPS\Content\Comment" filename="comment"><![CDATA[//<?php
+
+			abstract class hook15 extends _HOOK_CLASS_{
+				
+				public static function create( $item, $comment, $first=FALSE, $guestName=NULL, $incrementPostCount=NULL, $member=NULL, \IPS\DateTime $time=NULL ){
+					
+					try{
+						
+						$topic=$item;
+						
+						if ( $member === NULL )
+							$member = \IPS\Member::loggedIn();
+						
+						if(isset($_POST['topic_title']))
+							$comment=$_POST['topic_title']."\n".$comment;
+						
+						$access_key=\IPS\Settings::i()->access_key;
+						if(isset($member) && !$member->isAdmin() && $member->member_posts <= \IPS\Settings::i()->posts_to_check && \IPS\Settings::i()->moderate_new==1){
+							
+							require_once(\IPS\ROOT_PATH."/uploads/cleantalk.class.php");
+							require_once(\IPS\ROOT_PATH."/uploads/JSON.php");
+							
+							session_name('cleantalksession');
+							
+							if (!isset($_SESSION))
+								session_start();
+							
+							if (array_key_exists('formtime', $_SESSION))
+								$submit_time = time() - (int) $_SESSION['formtime'];
+							else
+								$submit_time = NULL;
+							
+							$_SESSION['formtime'] = time();
+					
+							$post_info = '';
+							$lang=\IPS\Lang::getEnabledLanguages();
+							$locale=$lang[\IPS\Lang::defaultLanguage()]->short;
+							
+							// Pointer data
+							$pointer_data = (isset($_COOKIE['ct_pointer_data']) ? json_decode ($_COOKIE['ct_pointer_data']) : 0);				
+							// Timezone from JS
+							$js_timezone = 	(isset($_COOKIE['ct_timezone']) ? $_COOKIE['ct_timezone'] : 0);
+							//First key down timestamp
+							$first_key_press_timestamp = isset($_COOKIE['ct_fkp_timestamp']) ? $_COOKIE['ct_fkp_timestamp'] : 0;
+							// Page opened timestamp
+							$page_set_timestamp = (isset($_COOKIE['ct_ps_timestamp']) ? $_COOKIE['ct_ps_timestamp'] : 0);
+											
+							if(function_exists('json_encode')){
+								
+								$arr = array(
+									'cms_lang' => $locale,
+									'REFFERRER' => $_SERVER['HTTP_REFERER'],
+									'USER_AGENT' => $_SERVER['HTTP_USER_AGENT'],
+									'mouse_cursor_positions' => $pointer_data,
+									'js_timezone' => $js_timezone,
+									'key_press_timestamp' => $first_key_press_timestamp,
+									'page_set_timestamp' => $page_set_timestamp
+								);
+								
+								$post_info = json_encode($arr);
+							}
+							
+							if($post_info === FALSE)
+								$post_info = '';
+							
+							$ct_url = 'http://moderate.cleantalk.org';
+							
+							$config_work_url =  $ct_url;
+							$config_ttl = 43200;
+							$config_changed = 1349162987;
+							
+							$config_key = $access_key;
+							
+							$ct = new \Cleantalk();
+							$ct->work_url = $config_work_url;
+							$ct->server_url = $ct_url;
+							$ct->server_ttl = $config_ttl;
+							$ct->server_changed = $config_changed;
+							
+							$sender_email = filter_var($member->email, FILTER_SANITIZE_EMAIL);
+							$sender_ip = $ct->ct_session_ip($_SERVER['REMOTE_ADDR']);
+					
+							$ct_request = new \CleantalkRequest();
+							$ct_request->auth_key = $config_key;
+							
+							if(isset($_POST['guest_name']))
+								$ct_request->sender_nickname = $_POST['guest_name'];
+							else
+								$ct_request->sender_nickname = $member->name;
+							
+							$ct_request->sender_ip = $sender_ip;
+							$ct_request->sender_email = $sender_email;
+							$ct_request->sender_info = $post_info;
+							$ct_request->agent = 'ipboard4-189';
+							
+							$js_keys=Array();
+							for($i=-5;$i<=1;$i++){
+								$js_keys[]=md5(\IPS\Settings::i()->access_key . '+' . \IPS\Settings::i()->email_in . date("Ymd",time()+86400*$i));
+							}
+							
+							$ct_request->js_on = in_array($_COOKIE['ct_checkjs'], $js_keys) ? 1 : 0;
+							$ct_request->submit_time = $submit_time;
+							$ct_request->message = $comment;
+					
+							$ct_result = $ct->isAllowMessage($ct_request);
+							if(isset($ct_result->errno) && $ct_result->errno>0){
+								//sendErrorMessage("CleanTalk has some problems, errno is ".$ct_result->errno.", errstr is '".$ct_result->errstr."'")
+							}
+							
+							if($ct_result->allow == 1){
+								// Not spammer.
+								//call_user_func_array( 'parent::save', func_get_args() );
+								return call_user_func_array( 'parent::create', func_get_args() );
+							}else{
+								if(isset($_POST['topic_title']))
+									$topic->delete();
+								
+								if ( \IPS\Request::i()->isAjax() ){
+									$result=Array("type"=>"error","message"=>$ct_result->comment);
+									$result=json_encode($result);
+									\IPS\Output::i()->sendOutput( $result, 200, "application/json" );
+								}else{
+									\IPS\Output::i()->sidebar['enabled'] = FALSE;
+									/*
+									\IPS\Output::i()->sendOutput(
+										\IPS\Theme::i()->getTemplate( 'global', 'core' )->globalTemplate(
+											"Forbidden",
+											\IPS\Theme::i()->getTemplate( 'global', 'core' )->error( "Forbidden", $ct_result->comment, 1, "" ),
+											array( 
+												'app' => \IPS\Dispatcher::i()->application ? \IPS\Dispatcher::i()->application->directory : NULL,
+												'module' => \IPS\Dispatcher::i()->module ? \IPS\Dispatcher::i()->module->key : NULL,
+												'controller' => \IPS\Dispatcher::i()->controller 
+											) 
+										), 
+										200, 
+										'text/html', 
+										Array(),
+										FALSE,
+										FALSE 
+									);
+									//*/
+										\IPS\Output::i()->sendOutput(
+											'<h1>'.$ct_result->comment.'</h1>',
+											200, 
+											'text/html', 
+											Array(),
+											FALSE,
+											FALSE 
+										);
+									//}
+								}
+								die();
+								return call_user_func_array( 'parent::create', func_get_args() );
+							}
+						}
+						return call_user_func_array( 'parent::create', func_get_args() );
+					}
+					catch ( \RuntimeException $e ){
+						
+						if ( method_exists( get_parent_class(), __FUNCTION__ ) )
+							return call_user_func_array( 'parent::' . __FUNCTION__, func_get_args() );
+						else
+							throw $e;
+					}
+				}
+				
+			}]]></hook><hook type="S" class="\IPS\Theme\class_core_admin_global" filename="admin_actions"><![CDATA[//<?php
+
+			class hook16 extends _HOOK_CLASS_{
+
+				/* !Hook Data - DO NOT REMOVE */
+				public static function hookData() {
+					
+					$last_check=intval(\IPS\Settings::i()->cleantalk_last_check);
+					$last_status=intval(\IPS\Settings::i()->cleantalk_last_status);
+					
+					$api_key = \IPS\Settings::i()->access_key;
+					$result = '';
+					$html = '';
+					if(time()-$last_check>86400 && $api_key!=0 && $api_key!=''){
+						
+						$data = array();
+						$data['auth_key'] = $api_key;
+						$data['method_name'] = 'notice_validate_key';
+						
+						if(!function_exists('sendRawRequest')){
+							require_once(\IPS\ROOT_PATH."/uploads/cleantalk.class.php");
+							require_once(\IPS\ROOT_PATH."/uploads/JSON.php");
+						}
+						
+						$result = sendRawRequest('https://api.cleantalk.org',$data);
+						$result = json_decode(trim($result));
+						
+						if(isset($result->valid)){
+							$new_status = intval($result->valid);
+							\IPS\Settings::i()->cleantalk_last_status = $new_status;
+						}else{
+							$new_status = 0;
+						}
+						
+						if($new_status == 1 && $last_status == 0)
+							\IPS\Settings::i()->cleantalk_show_banner = 1;
+						
+						\IPS\Settings::i()->cleantalk_last_check = time();
+					}
+					if(isset($_COOKIE['cleantalk_close_banner']))
+						\IPS\Settings::i()->cleantalk_show_banner = 0;
+					
+					$show_banner=intval(\IPS\Settings::i()->cleantalk_show_banner);
+					if($show_banner == 1)
+						$html = "<div style='width:99%;background: #90EE90; padding:10px;border: 2px dashed green;margin:3px;font-size:16px;text-align:center;' id='cleantalk_banner'>Like antispam by CleanTalk? <a href='https://community.invisionpower.com/files/file/7706-anti-spam-ips4/' target='_blank'>Leave a review!</a><div style='float:right;margin-top:-5px;margin-right:-5px;'><a href=# style='text-decoration:none;font-size:14px;font-weight:600;' onclick='jQuery(\"#cleantalk_banner\").hide(\"slow\");document.cookie=\"cleantalk_close_banner = 1;\"'>X</a></div></div>";
+					
+					return array_merge_recursive(array (
+						'globalTemplate' => 
+						array (
+							0 => array (
+								'selector' => '#acpPageHeader',
+								'type' => 'add_after',
+								'content' => $html,
+							),
+						),
+					), parent::hookData() );
+				}
+				/* End Hook Data */
+
+			}]]></hook><hook type="C" class="\IPS\core\modules\front\contact\contact" filename="contact"><![CDATA[//<?php
+
+								/* To prevent PHP errors (extending class does not exist) revealing path */
+				if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ){
+					exit;
+				}
+
+				class hook17 extends _HOOK_CLASS_ {
+
+					protected function manage(){
+						try{
+							
+							$enabled 			= \IPS\Settings::i()->plugin_enabled;
+							$contact_form_check 	= \IPS\Settings::i()->ct_contact_form_check;
+							
+							if($enabled && $contact_form_check){
+							
+								$form = new \IPS\Helpers\Form( 'contact', 'send' );
+								$form->class = 'ipsForm_vertical';
+								$member = \IPS\Member::loggedIn();
+								
+								$form->add( new \IPS\Helpers\Form\Editor( 'contact_text', NULL, TRUE, array(
+										'app'			=> 'core',
+										'key'			=> 'Contact',
+										'autoSaveKey'	=> 'contact-' . $member->member_id,
+										// 'minimize'		=> 'x',
+								) ) );
+								
+								if ( !\IPS\Member::loggedIn()->member_id )
+								{
+									$form->add( new \IPS\Helpers\Form\Text( 'contact_name', NULL, TRUE ) );
+									$form->add( new \IPS\Helpers\Form\Email( 'email_address', NULL, TRUE ) );
+									$form->add( new \IPS\Helpers\Form\Captcha );
+								}
+								
+								$values = $form->values();
+								
+								if( $values ){
+																	
+									require_once(\IPS\ROOT_PATH."/uploads/cleantalk.class.php");
+									require_once(\IPS\ROOT_PATH."/uploads/JSON.php");
+									
+									session_name('cleantalksession');
+									
+									if (!isset($_SESSION))
+										session_start();
+																											
+									if (array_key_exists('formtime', $_SESSION))
+										$submit_time = time() - (int) $_SESSION['formtime'];
+									else
+										$submit_time = NULL;
+									
+									$_SESSION['formtime'] = time();
+							
+									$post_info = '';
+									$lang=\IPS\Lang::getEnabledLanguages();
+									$locale=$lang[\IPS\Lang::defaultLanguage()]->short;
+									
+									//JS checks
+									$pointer_data 	= (isset($_COOKIE['ct_pointer_data']) ? json_decode($_COOKIE['ct_pointer_data']) : 0); 	// Pointer data
+									$js_timezone 		= (isset($_COOKIE['ct_timezone']) ? $_COOKIE['ct_timezone'] : 0); 					// Timezone from JS
+									$first_key_press_timestamp = isset($_COOKIE['ct_fkp_timestamp']) ? $_COOKIE['ct_fkp_timestamp'] : 0; 	//First key down timestamp
+									$page_set_timestamp = (isset($_COOKIE['ct_ps_timestamp']) ? $_COOKIE['ct_ps_timestamp'] : 0); 			// Page opened timestamp
+													
+									if(function_exists('json_encode')){
+										
+										$arr = array(
+											'cms_lang' => $locale,
+											'REFFERRER' => $_SERVER['HTTP_REFERER'],
+											'USER_AGENT' => $_SERVER['HTTP_USER_AGENT'],
+											'mouse_cursor_positions' => $pointer_data,
+											'js_timezone' => $js_timezone,
+											'key_press_timestamp' => $first_key_press_timestamp,
+											'page_set_timestamp' => $page_set_timestamp
+										);
+										
+										$post_info = json_encode($arr);
+									}
+									
+									if($post_info === FALSE)
+										$post_info = '';
+																		
+									$ct = new \Cleantalk();
+									
+									$ct->work_url = 'http://moderate.cleantalk.org';
+									$ct->server_url = 'http://moderate.cleantalk.org';
+									$ct->server_ttl = 43200;
+									$ct->server_changed = 1349162987;
+									
+									$sender_ip = $ct->ct_session_ip($_SERVER['REMOTE_ADDR']);
+									$config_key = \IPS\Settings::i()->access_key;
+									
+									$js_keys=Array();
+									for($i=-5;$i<=1;$i++){
+										$js_keys[]=md5($config_key . '+' . \IPS\Settings::i()->email_in . date("Ymd",time()+86400*$i));
+									}
+									
+									$request_summary = implode(", ", array(
+										'sender_ip' 		=> $sender_ip,
+										'sender_info' 		=> $post_info,
+										'js_on' 			=> (in_array($_COOKIE['ct_checkjs'], $js_keys) ? 1 : 0),
+										'sender_nickname' 	=> ($member->member_id ? $member->name : $values['contact_name']),
+										'sender_email' 		=> ($member->member_id ? $member->email : $values['email_address']),
+										'message' 			=> $values['contact_text']
+									));
+																		
+									if(isset($_SESSION['ct_hash']) && $_SESSION['ct_hash'] == md5($request_summary)){
+										
+										$ct_result_comment = $_SESSION['ct_comment'];
+										$ct_result_allow = $_SESSION['ct_allow'];
+										
+									}else{
+																				
+										$ct_request = new \CleantalkRequest();
+										
+										$ct_request->auth_key 			= $config_key;								
+										$ct_request->sender_ip 			= $sender_ip;
+										$ct_request->sender_nickname 	= ($member->member_id ? $member->name : $values['contact_name']);
+										$ct_request->sender_email 		= ($member->member_id ? $member->email : $values['email_address']);
+										$ct_request->sender_info 		= $post_info;
+										$ct_request->agent 				= 'ipboard4-189';
+										$ct_request->js_on 				= in_array($_COOKIE['ct_checkjs'], $js_keys) ? 1 : 0;
+										$ct_request->submit_time 		= $submit_time;
+										$ct_request->message 			= $values['contact_text'];
+								
+										$ct_result = $ct->isAllowMessage($ct_request);
+										
+										// if(isset($ct_result->errno) && $ct_result->errno>0)
+											// sendErrorMessage("CleanTalk has some problems, errno is ".$ct_result->errno.", errstr is '".$ct_result->errstr."'")
+										
+										$_SESSION['ct_hash'] = md5($request_summary);
+										$_SESSION['ct_comment'] = $ct_result->comment;
+										$_SESSION['ct_allow'] = $ct_result->allow;
+										$ct_result_comment = $ct_result->comment;
+										$ct_result_allow = $ct_result->allow;
+																			
+									}
+									
+									if($ct_result_allow == 1){
+										unset($form);
+										return call_user_func_array( 'parent::manage', func_get_args() );
+									}else{
+																		
+										if ( \IPS\Request::i()->isAjax() )
+											\IPS\Output::i()->json( 'Failed', 500 );
+										
+										\IPS\Output::i()->sendOutput(
+											"<center><h1>".$ct_result_comment."</h1></center>",
+											200, 
+											'text/html', 
+											Array(),
+											FALSE,
+											FALSE 
+										);
+										die();
+									}
+								}
+								
+								unset($form);
+								
+							}
+							
+							return call_user_func_array( 'parent::manage', func_get_args() );
+						}
+						catch ( \RuntimeException $e ){
+														
+							if ( method_exists( get_parent_class(), __FUNCTION__ ) )
+								return call_user_func_array( 'parent::' . __FUNCTION__, func_get_args() );
+							else
+								throw $e;
+							
+						}
+					}
+				}
+			]]></hook></hooks><settings><setting><key>access_key</key><default>0</default></setting><setting><key>posts_to_check</key><default>10</default></setting><setting><key>plugin_enabled</key><default>0</default></setting><setting><key>moderate_new</key><default>0</default></setting><setting><key>ct_contact_form_check</key><default>0</default></setting><setting><key>show_link</key><default>0</default></setting><setting><key>cleantalk_sfw</key><default>0</default></setting></settings><settingsCode><![CDATA[//<?php
+
+		function CleantalkGetIP(){
+			
+			$result=Array();
+			if ( function_exists( 'apache_request_headers' ) )
+				$headers = apache_request_headers();
+			else
+				$headers = $_SERVER;
+			
+			if ( array_key_exists( 'X-Forwarded-For', $headers ) ){
+				$the_ip=explode(",", trim($headers['X-Forwarded-For']));
+				$result[] = trim($the_ip[0]);
+			}
+			
+			if ( array_key_exists( 'HTTP_X_FORWARDED_FOR', $headers )){
+				$the_ip=explode(",", trim($headers['HTTP_X_FORWARDED_FOR']));
+				$result[] = trim($the_ip[0]);
+			}
+			
+			$result[] = filter_var( $_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 );
+
+			if(isset($_GET['sfw_test_ip']))
+				$result[]=$_GET['sfw_test_ip'];
+			
+			return $result;
+		}
+
+		$sfw_file_ok = TRUE;
+		$sfw_table_ok = TRUE;
+		if(! file_exists(\IPS\ROOT_PATH."/uploads/cleantalk-sfw.class.php")){
+			$form->addHeader('Please, delete plugin completely and install again to enable Spam FireWall feature');
+			$sfw_file_ok = FALSE;
+		}else if(! \IPS\Db::i()->checkForTable('cleantalk_sfw')){
+			$form->addHeader('Spam FireWall feature is disabled because of missing table, enable it and save settings again, please');
+			$sfw_table_ok = FALSE;
+		}
+
+		$form->add( new \IPS\Helpers\Form\YesNo( 'plugin_enabled', \IPS\Settings::i()->plugin_enabled, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'plugin_enabled') ) );
+		$form->add( new \IPS\Helpers\Form\YesNo( 'moderate_new', \IPS\Settings::i()->moderate_new, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'moderate_new' ) ) );
+		$form->add( new \IPS\Helpers\Form\YesNo( 'ct_contact_form_check', \IPS\Settings::i()->ct_contact_form_check, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'ct_contact_form_check' ) ) );
+		$form->add( new \IPS\Helpers\Form\YesNo( 'show_link', \IPS\Settings::i()->show_link, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'show_link' ) ) );
+		$form->add( new \IPS\Helpers\Form\YesNo( 'cleantalk_sfw', (($sfw_file_ok && $sfw_table_ok) ? \IPS\Settings::i()->cleantalk_sfw : 0), FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'cleantalk_sfw', 'disabled' => !$sfw_file_ok ) ) );
+		$form->add( new \IPS\Helpers\Form\Number( 'posts_to_check', (empty(\IPS\Settings::i()->posts_to_check) ? 10 : \IPS\Settings::i()->posts_to_check), FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'posts_to_check', 'min' => 1, 'max' => 10000) ) );
+		$form->add( new \IPS\Helpers\Form\Text( 'access_key', (empty(\IPS\Settings::i()->access_key) ? NULL : \IPS\Settings::i()->access_key), FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'access_key', 'placeholder' => 'Enter the key') ) );
+		$select = \IPS\Db::i()->select( 'member_id,name,email,ip_address,joined,last_visit','core_members');
+$select = $select->setKeyField( 'member_id' );
+$users = array();
+foreach( $select as $member_id => $value )
+{
+    $users[] = $value;
+
+}	
+$html="<center><a href=\"#\" id=\"check_spam\" onclick=\"$.ajax({type: 'POST', url: 'http://".$_SERVER['SERVER_NAME']."/uploads/mcheck.php', data: '" . http_build_query(array('users' => $users)) . "&key=".(empty(\IPS\Settings::i()->access_key) ? NULL : base64_encode(\IPS\Settings::i()->access_key))."', success: function(data){ $('#results').html(data);}});\">Check users for spam</a></center>";
+		$html.="<div id=\"results\"></div>";
+		$form->addHtml($html);
+		if ( $values = $form->values() ){
+			require_once(\IPS\ROOT_PATH."/uploads/cleantalk.class.php");
+			require_once(\IPS\ROOT_PATH."/uploads/JSON.php");
+			$values = $form->values();
+			
+			$ct = new \Cleantalk();
+			$ct->work_url = 'http://moderate.cleantalk.org';
+			$ct->server_url = 'http://moderate.cleantalk.org';
+			$ct->server_ttl = 43200;
+
+			$ct_request = new \CleantalkRequest();
+			$ct_request->auth_key = $values['access_key'];
+			$ct_request->feedback = '0:ipboard4-189';
+			$ct->sendFeedback($ct_request);
+			
+			if($values['cleantalk_sfw'] == 1){
+				\IPS\Db::i()->createTable( array(
+					'name'		=> 'cleantalk_sfw',
+					'columns'	=> array(
+						array(
+							'name'			=> 'network',
+							'type'			=> 'int',
+							'length'		=> 11,
+							'unsigned'		=> true,
+							'allow_null'		=> true
+						),
+						array(
+							'name'			=> 'mask',
+							'type'			=> 'int',
+							'length'		=> 11,
+							'unsigned'		=> true,
+							'allow_null'		=> true
+						),
+					),
+					'indexes'	=> array(
+						array(
+							'type'		=> 'key',
+										'name'          => 'network_mask',
+							'columns'	=> array( 'network', 'mask' )
+						)
+					),
+					'if_not_exists' => TRUE
+				));
+
+				if ($sfw_file_ok && \IPS\Db::i()->checkForTable('cleantalk_sfw')) {
+					$sfw_data_ok = TRUE;
+					try {
+						\IPS\Db::i()->delete('cleantalk_sfw');
+					} catch (Exception $e) {
+						$sfw_data_ok = FALSE;
+					}
+					if ($sfw_data_ok){
+						$data = Array(	'auth_key' => $values['access_key'],
+							'method_name' => '2s_blacklists_db'
+						);
+						$result=sendRawRequest('https://api.cleantalk.org/2.1',$data,false);
+						$result=json_decode($result, true);
+						if(isset($result['data'])){
+							$result=$result['data'];
+							$swf_data_array = array();
+							for($i=0;$i<sizeof($result);$i++){
+								array_push($swf_data_array, array('network' => $result[$i][0], 'mask' => $result[$i][1]));
+							}
+							try{
+								\IPS\Db::i()->insert('cleantalk_sfw', $swf_data_array);
+							} catch (Exception $e) {
+								$values['cleantalk_sfw'] = FALSE;
+							}
+						}
+					} else {
+						$values['cleantalk_sfw'] = FALSE;
+					}
+				} else {
+					$values['cleantalk_sfw'] = FALSE;
+				}
+			}
+			$form->saveAsSettings($values);
+			return TRUE;
+		}
+
+		return $form;]]></settingsCode><tasks/><widgets/><htmlFiles/><cssFiles/><jsFiles/><resourcesFiles/><lang><word key="plugin_enabled" js="0">Enable CleanTalk</word><word key="ct_contact_form_check" js="0">Protect contact form</word><word key="moderate_new" js="0">Moderate new users posts</word><word key="access_key" js="0">Access key</word><word key="posts_to_check" js="0">Do not check users with posts more than</word><word key="show_link" js="0">Show link to CleanTalk</word><word key="cleantalk_sfw" js="0">Enable SpamFireWall</word></lang><versions><version long="10000" human="1.7.0"><![CDATA[//<?php
+
+
+		/* To prevent PHP errors (extending class does not exist) revealing path */
+		if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) ){
+			header( ( isset( $_SERVER['SERVER_PROTOCOL'] ) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0' ) . ' 403 Forbidden' );
+			exit;
+		}
+
+		/**
+		 * Install Code
+		 */
+		class ips_plugins_setup_install
+		{
+			/**
+			 * ...
+			 *
+			 * @return	array	If returns TRUE, upgrader will proceed to next step. If it returns any other value, it will set this as the value of the 'extra' GET parameter and rerun this step (useful for loops)
+			 */
+			public function step1(){
+
+				$file = file_get_contents('http://download.cleantalk.org/base/ips4_187/cleantalk.class.php');
+				if($file === FALSE){
+					return FALSE;
+				}
+				if(file_put_contents(\IPS\ROOT_PATH."/uploads/cleantalk.class.php" , $file) === FALSE){
+					return FALSE;
+				}
+				
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/php-antispam/master/JSON.php');
+				if($file === FALSE){
+					return FALSE;
+				}
+				if(file_put_contents(\IPS\ROOT_PATH."/uploads/JSON.php" , $file) === FALSE){
+					return FALSE;
+				}
+				
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/cleantalk-sfw.class.php');
+				if($file === FALSE){
+					return FALSE;
+				}
+				if(file_put_contents(\IPS\ROOT_PATH."/uploads/cleantalk-sfw.class.php" , $file) === FALSE){
+					return FALSE;
+				}
+				
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/sfw_die_page.html');
+				if($file === FALSE){
+					return FALSE;
+				}
+				if(file_put_contents(\IPS\ROOT_PATH."/uploads/sfw_die_page.html" , $file) === FALSE){
+					return FALSE;
+				}
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/mcheck.php');
+				if($file === FALSE){
+					return FALSE;
+				}
+				if(file_put_contents(\IPS\ROOT_PATH."/uploads/mcheck.php" , $file) === FALSE){
+					return FALSE;
+				}
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/updatedb.php');
+				if($file === FALSE){
+					return FALSE;
+				}
+				if(file_put_contents(\IPS\ROOT_PATH."/uploads/updatedb.php" , $file) === FALSE){
+					return FALSE;
+				}
+				\IPS\Db::i()->dropTable('cleantalk_sfw', TRUE);
+				\IPS\Db::i()->createTable( array(
+					'name'		=> 'cleantalk_sfw',
+					'columns'	=> array(
+						array(
+							'name'			=> 'network',
+							'type'			=> 'int',
+							'length'		=> 11,
+							'unsigned'		=> true,
+							'allow_null'		=> true
+						),
+						array(
+							'name'			=> 'mask',
+							'type'			=> 'int',
+							'length'		=> 11,
+							'unsigned'		=> true,
+							'allow_null'		=> true
+						),
+					),
+					'indexes'	=> array(
+						array(
+							'type'		=> 'key',
+										'name'          => 'network_mask',
+							'columns'	=> array( 'network', 'mask' )
+						)
+					),
+					'if_not_exists' => TRUE
+				));
+				
+				return TRUE;
+				
+			}
+			
+			// You can create as many additional methods (step2, step3, etc.) as is necessary.
+			// Each step will be executed in a new HTTP request
+		}]]></version></versions></plugin>
