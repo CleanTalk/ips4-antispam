@@ -39,7 +39,6 @@
 						if($enabled==1&&$new){
 							
 							require_once(\IPS\ROOT_PATH."/uploads/cleantalk.class.php");
-							require_once(\IPS\ROOT_PATH."/uploads/JSON.php");
 							
 							session_name('cleantalksession');
 							
@@ -347,7 +346,6 @@
 						if(isset($member) && !$member->isAdmin() && $member->member_posts <= \IPS\Settings::i()->posts_to_check && \IPS\Settings::i()->moderate_new==1){
 							
 							require_once(\IPS\ROOT_PATH."/uploads/cleantalk.class.php");
-							require_once(\IPS\ROOT_PATH."/uploads/JSON.php");
 							
 							session_name('cleantalksession');
 							
@@ -560,7 +558,6 @@
 								if( $values ){
 																	
 									require_once(\IPS\ROOT_PATH."/uploads/cleantalk.class.php");
-									require_once(\IPS\ROOT_PATH."/uploads/JSON.php");
 									
 									session_name('cleantalksession');
 									
@@ -753,7 +750,6 @@
 		$form->addHtml($html);
 		if ( $values = $form->values() ){
 			require_once(\IPS\ROOT_PATH."/uploads/cleantalk.class.php");
-			require_once(\IPS\ROOT_PATH."/uploads/JSON.php");
 			$values = $form->values();
 			
 			$ct = new \Cleantalk();
@@ -832,7 +828,6 @@
 			$data['method_name'] = 'notice_validate_key';				
 			if(!function_exists('sendRawRequest')){
 				require_once(\IPS\ROOT_PATH."/uploads/cleantalk.class.php");
-				require_once(\IPS\ROOT_PATH."/uploads/JSON.php");
 			}
 			if (!empty($data['auth_key'])){
 				$result = sendRawRequest('https://api.cleantalk.org',$data);
@@ -872,7 +867,7 @@
 			 */
 			public function step1(){
 
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/cleantalk.class.php');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/cleantalk.class.php');
 				if($file === FALSE){
 					return FALSE;
 				}
@@ -880,15 +875,7 @@
 					return FALSE;
 				}
 				
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/JSON.php');
-				if($file === FALSE){
-					return FALSE;
-				}
-				if(file_put_contents(\IPS\ROOT_PATH."/uploads/JSON.php" , $file) === FALSE){
-					return FALSE;
-				}
-				
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/cleantalk-sfw.class.php');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/cleantalk-sfw.class.php');
 				if($file === FALSE){
 					return FALSE;
 				}
@@ -896,21 +883,21 @@
 					return FALSE;
 				}
 				
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/sfw_die_page.html');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/sfw_die_page.html');
 				if($file === FALSE){
 					return FALSE;
 				}
 				if(file_put_contents(\IPS\ROOT_PATH."/uploads/sfw_die_page.html" , $file) === FALSE){
 					return FALSE;
 				}
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/mcheck.php');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/mcheck.php');
 				if($file === FALSE){
 					return FALSE;
 				}
 				if(file_put_contents(\IPS\ROOT_PATH."/uploads/mcheck.php" , $file) === FALSE){
 					return FALSE;
 				}
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/updatedb.php');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/updatedb.php');
 				if($file === FALSE){
 					return FALSE;
 				}
