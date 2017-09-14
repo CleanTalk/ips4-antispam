@@ -879,7 +879,7 @@
        				unlink(\IPS\ROOT_PATH."/uploads/updatedb.php");
        			if (file_exists(\IPS\ROOT_PATH."/uploads/JSON.php")) 
        				unlink(\IPS\ROOT_PATH."/uploads/JSON.php");		
-			
+
 				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/cleantalk.class.php');
 				if($file === FALSE){
 					return FALSE;
@@ -953,22 +953,4 @@
 			
 			// You can create as many additional methods (step2, step3, etc.) as is necessary.
 			// Each step will be executed in a new HTTP request
-		}
-				/**
-		 * Install Code
-		 */
-		class ips_plugins_setup_uninstall
-		{
-			/**
-			 * ...
-			 *
-			 * @return	array	If returns TRUE, upgrader will proceed to next step. If it returns any other value, it will set this as the value of the 'extra' GET parameter and rerun this step (useful for loops)
-			 */
-			public function step1(){
-
-				
-				return TRUE;
-				
-			}
-			
 		}]]></version></versions></plugin>
