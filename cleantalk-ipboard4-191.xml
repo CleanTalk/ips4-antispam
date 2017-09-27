@@ -846,7 +846,7 @@
 
 		}
 
-		return $form;]]></settingsCode><tasks/><widgets/><htmlFiles/><cssFiles/><jsFiles/><resourcesFiles/><lang><word key="plugin_enabled" js="0">Enable CleanTalk</word><word key="ct_contact_form_check" js="0">Protect contact form</word><word key="moderate_new" js="0">Moderate new users posts</word><word key="access_key" js="0">Access key</word><word key="posts_to_check" js="0">Do not check users with posts more than</word><word key="show_link" js="0">Show link to CleanTalk</word><word key="cleantalk_sfw" js="0">Enable SpamFireWall</word></lang><versions><version long="10000" human="1.7.0"><![CDATA[//<?php
+		return $form;]]></settingsCode><tasks/><widgets/><htmlFiles/><cssFiles/><jsFiles/><resourcesFiles/><lang><word key="plugin_enabled" js="0">Enable CleanTalk</word><word key="ct_contact_form_check" js="0">Protect contact form</word><word key="moderate_new" js="0">Moderate new users posts</word><word key="access_key" js="0">Access key</word><word key="posts_to_check" js="0">Do not check users with posts more than</word><word key="show_link" js="0">Show link to CleanTalk</word><word key="cleantalk_sfw" js="0">Enable SpamFireWall</word></lang><versions><version long="10000" human="1.5.0"><![CDATA[//<?php
 
 
 		/* To prevent PHP errors (extending class does not exist) revealing path */
@@ -879,7 +879,6 @@
        				unlink(\IPS\ROOT_PATH."/uploads/updatedb.php");
        			if (file_exists(\IPS\ROOT_PATH."/uploads/JSON.php")) 
        				unlink(\IPS\ROOT_PATH."/uploads/JSON.php");		
-
 				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/cleantalk.class.php');
 				if($file === FALSE){
 					return FALSE;
@@ -953,4 +952,97 @@
 			
 			// You can create as many additional methods (step2, step3, etc.) as is necessary.
 			// Each step will be executed in a new HTTP request
-		}]]></version></versions></plugin>
+		}]]></version><version long="19100" human="1.9.1"><![CDATA[//<?php
+/* To prevent PHP errors (extending class does not exist) revealing path */
+if ( !defined( '\IPS\SUITE_UNIQUE_KEY' ) )
+{
+	header( ( isset( $_SERVER['SERVER_PROTOCOL'] ) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0' ) . ' 403 Forbidden' );
+	exit;
+}
+/**
+ * 1.9.1 Upgrade Code
+ */
+class ips_plugins_setup_upg_19100
+{
+	/**
+	 * ...
+	 *
+	 * @return	array	If returns TRUE, upgrader will proceed to next step. If it returns any other value, it will set this as the value of the 'extra' GET parameter and rerun this step (useful for loops)
+	 */
+	public function step1()
+	{
+       			if (file_exists(\IPS\ROOT_PATH."/uploads/JSON.php")) 
+       				unlink(\IPS\ROOT_PATH."/uploads/JSON.php");		
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/cleantalk.class.php');
+				if($file === FALSE){
+					return FALSE;
+				}
+				if(file_put_contents(\IPS\ROOT_PATH."/uploads/cleantalk.class.php" , $file) === FALSE){
+					return FALSE;
+				}
+				
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/cleantalk-sfw.class.php');
+				if($file === FALSE){
+					return FALSE;
+				}
+				if(file_put_contents(\IPS\ROOT_PATH."/uploads/cleantalk-sfw.class.php" , $file) === FALSE){
+					return FALSE;
+				}
+				
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/sfw_die_page.html');
+				if($file === FALSE){
+					return FALSE;
+				}
+				if(file_put_contents(\IPS\ROOT_PATH."/uploads/sfw_die_page.html" , $file) === FALSE){
+					return FALSE;
+				}
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/mcheck.php');
+				if($file === FALSE){
+					return FALSE;
+				}
+				if(file_put_contents(\IPS\ROOT_PATH."/uploads/mcheck.php" , $file) === FALSE){
+					return FALSE;
+				}
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/updatedb.php');
+				if($file === FALSE){
+					return FALSE;
+				}
+				if(file_put_contents(\IPS\ROOT_PATH."/uploads/updatedb.php" , $file) === FALSE){
+					return FALSE;
+				}
+
+				\IPS\Db::i()->dropTable('cleantalk_sfw', TRUE);
+				\IPS\Db::i()->createTable( array(
+					'name'		=> 'cleantalk_sfw',
+					'columns'	=> array(
+						array(
+							'name'			=> 'network',
+							'type'			=> 'int',
+							'length'		=> 11,
+							'unsigned'		=> true,
+							'allow_null'		=> true
+						),
+						array(
+							'name'			=> 'mask',
+							'type'			=> 'int',
+							'length'		=> 11,
+							'unsigned'		=> true,
+							'allow_null'		=> true
+						),
+					),
+					'indexes'	=> array(
+						array(
+							'type'		=> 'key',
+										'name'          => 'network_mask',
+							'columns'	=> array( 'network', 'mask' )
+						)
+					),
+					'if_not_exists' => TRUE
+				));
+				
+				return TRUE;
+	}
+	
+	// You can create as many additional methods (step2, step3, etc.) as is necessary.
+	// Each step will be executed in a new HTTP request
+}]]></version></versions></plugin>
