@@ -73,6 +73,7 @@ $html.='<center><table id="table_results" style="border-color:#666666;" border=1
 	</tr>
 	</thead>
 	<tbody>';
+
 	foreach ($spam_array as $key=>$value)
 {
 		$last_visit = (!empty($value['last_visit']))?date("Y-m-d H:i:s",$value['last_visit']):"<center>-</center>";	
@@ -84,9 +85,10 @@ $html.='<center><table id="table_results" style="border-color:#666666;" border=1
         <td><center><a target='_blank' href='https://cleantalk.org/blacklists/".$value['ip_address']."'><img src='https://cleantalk.org/images/icons/external_link.gif' border='0'/> ".$value['ip_address']."</a></center></td>
         <td><center>".$last_visit."</center></td>
         </tr>";
+        $spam_ids[] = $value['member_id'];
 }
 
-$html.="</tbody></table></center><br/><center><b><a href=\"#\" id=\"ct_delete_checked\" onclick=\"var answer = confirm('Are you sure you want to delete these users? All messages and topics from this users also will be deleted!'); if (answer) $.ajax({type: 'POST', url: 'http://".$_SERVER['SERVER_NAME']."/uploads/updatedb.php', data: ''});\">Delete seleceted</a></b><span style='padding-left:10px;'> </span> <b><a href=\"#\" id=\"ct_delete_all\" onclick=\"var answer = confirm('Are you sure you want to delete these users? All messages and topics from this users also will be deleted!'); if (answer){ $.ajax({type: 'POST', url: 'http://".$_SERVER['SERVER_NAME']."/uploads/updatedb.php', data: '" . http_build_query(array('spam_users' => $spam_array)) . "', success: function(data){ $('#delete_results').html(data);}});}\">Delete all</a></b></center><br /><div id = 'delete_results'></div>";
+$html.="</tbody></table></center><br/><center><b><a href=\"#\" id=\"ct_delete_checked\" onclick=\"var answer = confirm('Are you sure you want to delete these users? All messages and topics from this users also will be deleted!'); if (answer) { var data = {'spam_users':get_checked()}; $.ajax({type: 'POST', data: data, url: 'http://".$_SERVER['SERVER_NAME']."/uploads/updatedb.php', success: function(data){ $('#delete_results').html(data);}});} \">Delete selected</a></b><span style='padding-left:10px;'> </span> <b><a href=\"#\" id=\"ct_delete_all\" onclick=\"var answer = confirm('Are you sure you want to delete these users? All messages and topics from this users also will be deleted!'); if (answer){ $.ajax({type: 'POST', url: 'http://".$_SERVER['SERVER_NAME']."/uploads/updatedb.php', data: '" . http_build_query(array('spam_users' => $spam_ids)) . "', success: function(data){ $('#delete_results').html(data);}});}\">Delete all</a></b></center><br /><div id = 'delete_results'></div>";
 }
 else
 {
@@ -97,5 +99,21 @@ else
 {
 	$html='<center><h3>Access key error!</h3><br /></center>';
 }
+$html.="<script>
+function get_checked()
+{
+	var ids = new Array()
+	jQuery('input:checked').each(function() {
+	if (jQuery(this).attr('name').startsWith('ct_del_user'))
+	{
+		var id=jQuery(this).attr('name').substring(jQuery(this).attr('name').lastIndexOf('[')+1,jQuery(this).attr('name').lastIndexOf(']'));
+		ids.push(id);					
+	}				
+	});	
+	return ids;
+}</script>";
 echo $html;
+
+
+
 ?>

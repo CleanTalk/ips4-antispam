@@ -36,28 +36,6 @@ if( !function_exists('apache_request_headers') ) {
 	  return( $arh );
 	}
 }
-
-/**
-* Load JSON functions if they are not exists 
-*/
-if(!function_exists('json_encode')) {
-    require_once 'JSON.php';
-
-    function json_encode($data) {
-        $json = new Services_JSON();
-        return( $json->encode($data) );
-    }
-
-}
-if(!function_exists('json_decode')) {
-    require_once 'JSON.php';
-
-    function json_decode($data) {
-        $json = new Services_JSON();
-        return( $json->decode($data) );
-    }
-}
-
 /**
  * Response class
  */
