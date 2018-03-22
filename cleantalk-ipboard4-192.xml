@@ -86,7 +86,7 @@
 							$ct->server_changed = $config_changed;
 					
 							$sender_email = filter_var($_POST['email_address'], FILTER_SANITIZE_EMAIL);
-							$sender_ip = $ct->ct_session_ip($_SERVER['REMOTE_ADDR']);
+							$sender_ip = $ct->cleantalk_get_real_ip();
 					
 							$ct_request = new \CleantalkRequest();
 							$ct_request->auth_key = $config_key;
@@ -179,8 +179,6 @@
 							}
 						}
 						
-						if(session_id()=='')
-							session_start();
 						
 						$show_link=\IPS\Settings::i()->show_link;
 						$html = '
@@ -386,7 +384,7 @@
 							$ct->server_changed = $config_changed;
 							
 							$sender_email = filter_var($member->email, FILTER_SANITIZE_EMAIL);
-							$sender_ip = $ct->ct_session_ip($_SERVER['REMOTE_ADDR']);
+							$sender_ip = $ct->cleantalk_get_real_ip();
 					
 							$ct_request = new \CleantalkRequest();
 							$ct_request->auth_key = $config_key;
@@ -577,7 +575,7 @@
 									$ct->server_ttl = 43200;
 									$ct->server_changed = 1349162987;
 									
-									$sender_ip = $ct->ct_session_ip($_SERVER['REMOTE_ADDR']);
+									$sender_ip = $ct->cleantalk_get_real_ip();
 									$config_key = \IPS\Settings::i()->access_key;
 									
 									$js_keys=Array();
