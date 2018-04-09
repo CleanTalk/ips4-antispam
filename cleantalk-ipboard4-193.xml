@@ -109,7 +109,7 @@
 								// Spammer - display message and exit.
 								
 								if ( \IPS\Request::i()->isAjax() ){
-									$err_str = '<span style="color:#ab1f39;">' . $ct_result->comment . '</span><script>setTimeout("history.back()", 5000);</script>';
+									$err_str = '<span style="color:#ab1f39;">' . $ct_result->comment . '</span><script>setTimeout("history.back()", 8000);</script>';
 									print $err_str;
 								}else{
 									\IPS\Output::i()->sidebar['enabled'] = FALSE;
@@ -491,7 +491,7 @@
 												<body id="error-page">
 													<p><center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> Spam protection</center><br><br>
 												%ERROR_TEXT%
-												<script>setTimeout("history.back()", 5000);</script></p>
+												<script>setTimeout("history.back()", 8000);</script></p>
 												<p><a href="javascript:history.back()"">&laquo; Back</a></p></body>';
 										\IPS\Output::i()->sendOutput(str_replace('%ERROR_TEXT%', $ct_result->comment, $ct_die_html),
 											200, 
@@ -721,7 +721,7 @@
 														<body id="error-page">
 															<p><center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> Spam protection</center><br><br>
 														%ERROR_TEXT%
-														<script>setTimeout("history.back()", 5000);</script></p>
+														<script>setTimeout("history.back()", 8000);</script></p>
 														<p><a href="javascript:history.back()"">&laquo; Back</a></p></body>';											
 											\IPS\Output::i()->sendOutput(
 												str_replace('%ERROR_TEXT%',$ct_result_comment, $ct_die_html),
