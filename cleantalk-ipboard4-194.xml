@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin name="CleanTalk Spam protect" version_long="19300" version_human="1.9.3" author="CleanTalk" website="https://cleantalk.org" update_check=""><hooks><hook type="C" class="\IPS\Member" filename="registration"><![CDATA[//<?php
+<plugin name="CleanTalk Spam protect" version_long="19400" version_human="1.9.4" author="CleanTalk" website="https://cleantalk.org" update_check=""><hooks><hook type="C" class="\IPS\Member" filename="registration"><![CDATA[//<?php
 
 			class hook13 extends _HOOK_CLASS_{
 				
@@ -70,20 +70,20 @@
 							}
 							if($post_info === FALSE)
 								$post_info = '';
-							
-							$ct_url = 'http://moderate.cleantalk.org';
-							
-							$config_work_url =  $ct_url;
-							$config_ttl = 43200;
-							$config_changed = 1349162987;
+						
 					
 							$config_key = $access_key;
 							
 							$ct = new \Cleantalk();
-							$ct->work_url = $config_work_url;
-							$ct->server_url = $ct_url;
-							$ct->server_ttl = $config_ttl;
-							$ct->server_changed = $config_changed;
+							$ct->work_url = \IPS\Settings::i()->ct_work_url;
+							$ct->server_ttl = \IPS\Settings::i()->ct_server_ttl;
+							$ct->server_changed = \IPS\Settings::i()->ct_server_changed;
+							if ($ct->server_change)
+							{
+								\IPS\Settings::i()->ct_work_url = $ct->work_url;
+								\IPS\Settings::i()->ct_server_ttl = $ct->server_ttl;
+								\IPS\Settings::i()->ct_server_changed = time();
+							}
 					
 							$sender_email = filter_var($_POST['email_address'], FILTER_SANITIZE_EMAIL);
 							$sender_ip = $ct->cleantalk_get_real_ip();
@@ -94,7 +94,7 @@
 							$ct_request->sender_ip = $sender_ip;
 							$ct_request->sender_email = $sender_email;
 							$ct_request->sender_info = $post_info;
-							$ct_request->agent = 'ipboard4-193';
+							$ct_request->agent = 'ipboard4-194';
 							//$ct_request->js_on = $_COOKIE['ct_checkjs'] == md5(\IPS\Settings::i()->access_key . '+' . \IPS\Settings::i()->email_in) ? 1 : 0;
 							$ct_request->js_on = in_array($_COOKIE['ct_checkjs'], self::getCheckJSArray()) ? 1 : 0;
 							$ct_request->submit_time = isset($_COOKIE['ct_ps_timestamp']) ? time() - intval($_COOKIE['ct_ps_timestamp']) : 0;
@@ -367,20 +367,20 @@
 							
 							if($post_info === FALSE)
 								$post_info = '';
-							
-							$ct_url = 'http://moderate.cleantalk.org';
-							
-							$config_work_url =  $ct_url;
-							$config_ttl = 43200;
-							$config_changed = 1349162987;
+						
 							
 							$config_key = $access_key;
 							
 							$ct = new \Cleantalk();
-							$ct->work_url = $config_work_url;
-							$ct->server_url = $ct_url;
-							$ct->server_ttl = $config_ttl;
-							$ct->server_changed = $config_changed;
+							$ct->work_url = \IPS\Settings::i()->ct_work_url;
+							$ct->server_ttl = \IPS\Settings::i()->ct_server_ttl;
+							$ct->server_changed = \IPS\Settings::i()->ct_server_changed;
+							if ($ct->server_change)
+							{
+								\IPS\Settings::i()->ct_work_url = $ct->work_url;
+								\IPS\Settings::i()->ct_server_ttl = $ct->server_ttl;
+								\IPS\Settings::i()->ct_server_changed = time();
+							}
 							
 							$sender_email = filter_var($member->email, FILTER_SANITIZE_EMAIL);
 							$sender_ip = $ct->cleantalk_get_real_ip();
@@ -396,7 +396,7 @@
 							$ct_request->sender_ip = $sender_ip;
 							$ct_request->sender_email = $sender_email;
 							$ct_request->sender_info = $post_info;
-							$ct_request->agent = 'ipboard4-193';
+							$ct_request->agent = 'ipboard4-194';
 							
 							$js_keys=Array();
 							for($i=-5;$i<=1;$i++){
@@ -617,11 +617,15 @@
 																		
 									$ct = new \Cleantalk();
 									
-									$ct->work_url = 'http://moderate.cleantalk.org';
-									$ct->server_url = 'http://moderate.cleantalk.org';
-									$ct->server_ttl = 43200;
-									$ct->server_changed = 1349162987;
-									
+									$ct->work_url = \IPS\Settings::i()->ct_work_url;
+									$ct->server_ttl = \IPS\Settings::i()->ct_server_ttl;
+									$ct->server_changed = \IPS\Settings::i()->ct_server_changed;
+									if ($ct->server_change)
+									{
+										\IPS\Settings::i()->ct_work_url = $ct->work_url;
+										\IPS\Settings::i()->ct_server_ttl = $ct->server_ttl;
+										\IPS\Settings::i()->ct_server_changed = time();
+									}
 									$sender_ip = $ct->cleantalk_get_real_ip();
 									$config_key = \IPS\Settings::i()->access_key;
 									
@@ -647,7 +651,7 @@
 									$ct_request->sender_nickname 	= ($member->member_id ? $member->name : $values['contact_name']);
 									$ct_request->sender_email 		= ($member->member_id ? $member->email : $values['email_address']);
 									$ct_request->sender_info 		= $post_info;
-									$ct_request->agent 				= 'ipboard4-193';
+									$ct_request->agent 				= 'ipboard4-194';
 									$ct_request->js_on 				= in_array($_COOKIE['ct_checkjs'], $js_keys) ? 1 : 0;
 									$ct_request->submit_time 		= isset($_COOKIE['ct_ps_timestamp']) ? time() - intval($_COOKIE['ct_ps_timestamp']) : 0;
 									$ct_request->message 			= trim(strip_tags($values['contact_text']));
@@ -752,7 +756,7 @@
 						}
 					}
 				}
-			]]></hook></hooks><settings><setting><key>access_key</key><default>0</default></setting><setting><key>posts_to_check</key><default>10</default></setting><setting><key>plugin_enabled</key><default>0</default></setting><setting><key>moderate_new</key><default>0</default></setting><setting><key>ct_contact_form_check</key><default>0</default></setting><setting><key>show_link</key><default>0</default></setting><setting><key>cleantalk_sfw</key><default>0</default></setting></settings><settingsCode><![CDATA[//<?php
+			]]></hook></hooks><settings><setting><key>access_key</key><default>0</default></setting><setting><key>posts_to_check</key><default>10</default></setting><setting><key>plugin_enabled</key><default>0</default></setting><setting><key>moderate_new</key><default>0</default></setting><setting><key>ct_contact_form_check</key><default>0</default></setting><setting><key>show_link</key><default>0</default></setting><setting><key>cleantalk_sfw</key><default>0</default></setting><setting><key>ct_work_url</key><default>0</default></setting><setting><key>ct_server_ttl</key><default>0</default></setting><setting><key>ct_server_changed</key><default>0</default></setting></settings><settingsCode><![CDATA[//<?php
 
 		function CleantalkGetIP(){
 			
@@ -814,13 +818,19 @@
 			$values = $form->values();
 			
 			$ct = new \Cleantalk();
-			$ct->work_url = 'http://moderate.cleantalk.org';
-			$ct->server_url = 'http://moderate.cleantalk.org';
-			$ct->server_ttl = 43200;
+			$ct->work_url = \IPS\Settings::i()->ct_work_url;
+			$ct->server_ttl = \IPS\Settings::i()->ct_server_ttl;
+			$ct->server_changed = \IPS\Settings::i()->ct_server_changed;
+			if ($ct->server_change)
+			{
+				\IPS\Settings::i()->ct_work_url = $ct->work_url;
+				\IPS\Settings::i()->ct_server_ttl = $ct->server_ttl;
+				\IPS\Settings::i()->ct_server_changed = time();
+			}
 
 			$ct_request = new \CleantalkRequest();
 			$ct_request->auth_key = $values['access_key'];
-			$ct_request->feedback = '0:ipboard4-193';
+			$ct_request->feedback = '0:ipboard4-194';
 			$ct->sendFeedback($ct_request);
 			
 			if($values['cleantalk_sfw'] == 1){
