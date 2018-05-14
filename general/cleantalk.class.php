@@ -604,7 +604,7 @@ class Cleantalk {
      * @param $msg
      * @return boolean|\CleantalkResponse
      */
-    private function sendRequest($data = null, $url, $server_timeout = 3) {
+    private function sendRequest($data = null, $url, $server_timeout = 15) {
         // Convert to array
         $data = (array)json_decode(json_encode($data), true);
 
@@ -1134,7 +1134,7 @@ function noticePaidTill($api_key)
  * @return type
  */
 
-function sendRawRequest($url,$data,$isJSON=false,$timeout=3)
+function sendRawRequest($url,$data,$isJSON=false,$timeout=15)
 {
     $result=null;
     if(!$isJSON)
