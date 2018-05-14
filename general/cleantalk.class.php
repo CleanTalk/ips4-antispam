@@ -1136,52 +1136,66 @@ function noticePaidTill($api_key)
 
 function sendRawRequest($url,$data,$isJSON=false,$timeout=3)
 {
-	$result=null;
-	if(!$isJSON)
-	{
-		$data=http_build_query($data);
-		$data=str_replace("&amp;", "&", $data);
-	}
-	else
-	{
-		$data= json_encode($data);
-	}
-	$curl_exec=false;
-	if (function_exists('curl_init') && function_exists('json_decode'))
-	{
-	
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
-		curl_setopt($ch, CURLOPT_POST, true);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-		
-		// receive server response ...
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		// resolve 'Expect: 100-continue' issue
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
-		
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-		
-		$result = @curl_exec($ch);
-		if($result!==false)
-		{
-			$curl_exec=true;
-		}
-		@curl_close($ch);
-	}
-	if(!$curl_exec)
-	{
-		$opts = array(
-		    'http'=>array(
-		        'method'=>"POST",
-		        'content'=>$data)
-		);
-		$context = stream_context_create($opts);
-		$result = @file_get_contents($url, 0, $context);
-	}
-	return $result;
+    $result=null;
+    if(!$isJSON)
+    {
+        $data=http_build_query($data);
+        $data=str_replace("&amp;", "&", $data);
+    }
+    else
+    {
+        $data= json_encode($data);
+    }
+    $curl_error = null;
+    if (function_exists('curl_init') && function_exists('json_decode'))
+    {
+    
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        
+        // receive server response ...
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // resolve 'Expect: 100-continue' issue
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
+        
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        
+        $result = @curl_exec($ch);
+        if (!$result)
+            $curl_error = curl_error($ch);
+        @curl_close($ch);
+    }
+    if(!$result)
+    {
+        $allow_url_fopen = ini_get('allow_url_fopen');
+        if (function_exists('file_get_contents') && isset($allow_url_fopen) && $allow_url_fopen == '1')
+        {
+            $opts = array(
+                'http'=>array(
+                    'method'=>"POST",
+                    'content'=>$data)
+            );
+            $context = stream_context_create($opts);
+            $result = @file_get_contents($url, 0, $context);            
+        }
+
+    }
+    if (!$result || !cleantalk_is_JSON($result))
+    {
+        $response = null;
+        $response['errno'] = 1;
+        $response['errstr'] = true;
+        $response['curl_err'] = isset($curl_error) ? $curl_error : false;
+        $response = json_decode(json_encode($response));
+
+        return $response;
+    }
+    $response = $result;
+    return $response;
 }
 
 if( !function_exists('apache_request_headers') )
