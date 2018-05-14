@@ -604,7 +604,7 @@ class Cleantalk {
      * @param $msg
      * @return boolean|\CleantalkResponse
      */
-    private function sendRequest($data = null, $url, $server_timeout = 3) {
+    private function sendRequest($data = null, $url, $server_timeout = 15) {
         // Convert to array
         $data = (array)json_decode(json_encode($data), true);
 
@@ -637,14 +637,13 @@ class Cleantalk {
             
             // Disabling CA cert verivication
             // Disabling common name verification
-            if ($this->ssl_on && $this->ssl_path=='') {
-                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-            }
-            else if ($this->ssl_on && $this->ssl_path!='') {
-            	curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
-                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, true);
+            if ($this->ssl_on && $this->ssl_path != '') {
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
                 curl_setopt($ch, CURLOPT_CAINFO, $this->ssl_path);
+            }else{ // Disabling CA cert verivication and common name verification
+                curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+                curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 0);
             }
 
             $result = curl_exec($ch);
@@ -1135,54 +1134,68 @@ function noticePaidTill($api_key)
  * @return type
  */
 
-function sendRawRequest($url,$data,$isJSON=false,$timeout=3)
+function sendRawRequest($url,$data,$isJSON=false,$timeout=15)
 {
-	$result=null;
-	if(!$isJSON)
-	{
-		$data=http_build_query($data);
-		$data=str_replace("&amp;", "&", $data);
-	}
-	else
-	{
-		$data= json_encode($data);
-	}
-	$curl_exec=false;
-	if (function_exists('curl_init') && function_exists('json_decode'))
-	{
-	
-		$ch = curl_init();
-		curl_setopt($ch, CURLOPT_URL, $url);
-		curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
-		curl_setopt($ch, CURLOPT_POST, true);
-		curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-		
-		// receive server response ...
-		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-		// resolve 'Expect: 100-continue' issue
-		curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
-		
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-		
-		$result = @curl_exec($ch);
-		if($result!==false)
-		{
-			$curl_exec=true;
-		}
-		@curl_close($ch);
-	}
-	if(!$curl_exec)
-	{
-		$opts = array(
-		    'http'=>array(
-		        'method'=>"POST",
-		        'content'=>$data)
-		);
-		$context = stream_context_create($opts);
-		$result = @file_get_contents($url, 0, $context);
-	}
-	return $result;
+    $result=null;
+    if(!$isJSON)
+    {
+        $data=http_build_query($data);
+        $data=str_replace("&amp;", "&", $data);
+    }
+    else
+    {
+        $data= json_encode($data);
+    }
+    $curl_error = null;
+    if (function_exists('curl_init') && function_exists('json_decode'))
+    {
+    
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+        
+        // receive server response ...
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        // resolve 'Expect: 100-continue' issue
+        curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
+        
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        
+        $result = @curl_exec($ch);
+        if (!$result)
+            $curl_error = curl_error($ch);
+        @curl_close($ch);
+    }
+    if(!$result)
+    {
+        $allow_url_fopen = ini_get('allow_url_fopen');
+        if (function_exists('file_get_contents') && isset($allow_url_fopen) && $allow_url_fopen == '1')
+        {
+            $opts = array(
+                'http'=>array(
+                    'method'=>"POST",
+                    'content'=>$data)
+            );
+            $context = stream_context_create($opts);
+            $result = @file_get_contents($url, 0, $context);            
+        }
+
+    }
+    if (!$result || !cleantalk_is_JSON($result))
+    {
+        $response = null;
+        $response['errno'] = 1;
+        $response['errstr'] = true;
+        $response['curl_err'] = isset($curl_error) ? $curl_error : false;
+        $response = json_decode(json_encode($response));
+
+        return $response;
+    }
+    $response = $result;
+    return $response;
 }
 
 if( !function_exists('apache_request_headers') )
