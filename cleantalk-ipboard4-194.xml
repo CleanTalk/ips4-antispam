@@ -101,7 +101,7 @@
 								\IPS\Settings::i()->ct_server_ttl = $ct->server_ttl;
 								\IPS\Settings::i()->ct_server_changed = time();
 							}							
-							if ($ct_result)
+							if ($ct_result && isset($ct_result->errno) && $ct_result->errno == 0)
 							{
 								if(isset($ct_result->errno) && $ct_result->errno>0){
 									//sendErrorMessage("CleanTalk has some problems, errno is ".$ct_result->errno.", errstr is '".$ct_result->errstr."'")
@@ -414,7 +414,7 @@
 								\IPS\Settings::i()->ct_server_ttl = $ct->server_ttl;
 								\IPS\Settings::i()->ct_server_changed = time();
 							}							
-							if ($ct_result)
+							if ($ct_result && isset($ct_result->errno) && $ct_result->errno == 0)
 							{
 								if(isset($ct_result->errno) && $ct_result->errno>0){
 									//sendErrorMessage("CleanTalk has some problems, errno is ".$ct_result->errno.", errstr is '".$ct_result->errstr."'")
@@ -669,7 +669,7 @@
 									// if(isset($ct_result->errno) && $ct_result->errno>0)
 										// sendErrorMessage("CleanTalk has some problems, errno is ".$ct_result->errno.", errstr is '".$ct_result->errstr."'")
 									
-									if ($ct_result)
+									if ($ct_result && isset($ct_result->errno) && $ct_result->errno == 0)
 									{
 										$ct_result_comment = $ct_result->comment;
 										$ct_result_allow = $ct_result->allow;
