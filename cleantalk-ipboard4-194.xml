@@ -797,7 +797,7 @@
 		$sfw_file_ok = TRUE;
 		$sfw_table_ok = TRUE;
 		if(!file_exists(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/cleantalk-sfw.class.php") || !file_exists(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/cleantalk.class.php")){
-			$form->addHeader('Missing core files! Please, download them directly from https://github.com/CleanTalk/ips4-antispam/tree/dev/general/ and put into /root/plugins/cleantalkspamprotect/');
+			$form->addHeader('Missing core files! Please, download them directly from https://github.com/CleanTalk/ips4-antispam/tree/master/general/ and put into /your_root_folder/plugins/cleantalkspamprotect/');
 			$sfw_file_ok = FALSE;
 		}else if(! \IPS\Db::i()->checkForTable('cleantalk_sfw')){
 			$form->addHeader('Spam FireWall feature is disabled because of missing table, enable it and save settings again, please');
@@ -969,7 +969,7 @@
        				unlink(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/updatedb.php");
        			if (file_exists(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/JSON.php")) 
        				unlink(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/JSON.php");		
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/cleantalk.class.php');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/cleantalk.class.php');
 				if($file === FALSE){
 					return FALSE;
 				}
@@ -977,7 +977,7 @@
 					return FALSE;
 				}
 				
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/cleantalk-sfw.class.php');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/cleantalk-sfw.class.php');
 				if($file === FALSE){
 					return FALSE;
 				}
@@ -985,21 +985,21 @@
 					return FALSE;
 				}
 				
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/sfw_die_page.html');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/sfw_die_page.html');
 				if($file === FALSE){
 					return FALSE;
 				}
 				if(file_put_contents(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/sfw_die_page.html" , $file) === FALSE){
 					return FALSE;
 				}
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/mcheck.php');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/mcheck.php');
 				if($file === FALSE){
 					return FALSE;
 				}
 				if(file_put_contents(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/mcheck.php" , $file) === FALSE){
 					return FALSE;
 				}
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/updatedb.php');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/updatedb.php');
 				if($file === FALSE){
 					return FALSE;
 				}
@@ -1063,7 +1063,7 @@ class ips_plugins_setup_upg_19100
 	{
        			if (file_exists(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/JSON.php")) 
        				unlink(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/JSON.php");		
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/cleantalk.class.php');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/cleantalk.class.php');
 				if($file === FALSE){
 					return FALSE;
 				}
@@ -1071,7 +1071,7 @@ class ips_plugins_setup_upg_19100
 					return FALSE;
 				}
 				
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/cleantalk-sfw.class.php');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/cleantalk-sfw.class.php');
 				if($file === FALSE){
 					return FALSE;
 				}
@@ -1079,21 +1079,21 @@ class ips_plugins_setup_upg_19100
 					return FALSE;
 				}
 				
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/sfw_die_page.html');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/sfw_die_page.html');
 				if($file === FALSE){
 					return FALSE;
 				}
 				if(file_put_contents(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/sfw_die_page.html" , $file) === FALSE){
 					return FALSE;
 				}
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/mcheck.php');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/mcheck.php');
 				if($file === FALSE){
 					return FALSE;
 				}
 				if(file_put_contents(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/mcheck.php" , $file) === FALSE){
 					return FALSE;
 				}
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/dev/general/updatedb.php');
+				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/updatedb.php');
 				if($file === FALSE){
 					return FALSE;
 				}
