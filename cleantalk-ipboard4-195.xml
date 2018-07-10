@@ -22,7 +22,26 @@
 							throw $e;
 					}
 				}
-
+			    public function ctCookiesTest()
+			    {   
+			        if(isset($_COOKIE['ct_cookies_test'])){
+			            
+			            $cookie_test = json_decode(stripslashes($_COOKIE['ct_cookies_test']), true);
+			            
+			            $check_srting = trim(\IPS\Settings::i()->access_key);
+			            foreach($cookie_test['cookies_names'] as $cookie_name){
+			                $check_srting .= isset($_COOKIE[$cookie_name]) ? $_COOKIE[$cookie_name] : '';
+			            } unset($cokie_name);
+			            
+			            if($cookie_test['check_value'] == md5($check_srting)){
+			                return 1;
+			            }else{
+			                return 0;
+			            }
+			        }else{
+			            return null;
+			        }
+			    }
 				/**
 				 * [ActiveRecord] Save Changed Columns
 				 *
@@ -64,7 +83,8 @@
 									'js_timezone' => $js_timezone,
 									'key_press_timestamp' => $first_key_press_timestamp,
 									'page_set_timestamp' => $page_set_timestamp,
-									'REFFERRER_PREVIOUS' => isset($_COOKIE['ct_prev_referer'])?$_COOKIE['ct_prev_referer']:null
+									'REFFERRER_PREVIOUS' => isset($_COOKIE['ct_prev_referer'])?$_COOKIE['ct_prev_referer']:null,
+									'cookies_enabled' => self::ctCookiesTest(),
 								);
 								$post_info = json_encode($arr);
 							}
@@ -274,7 +294,7 @@
 						$html = sprintf($html, $ct_checkjs_key);
 						if($show_link==1 && \IPS\Settings::i()->plugin_enabled)
 							$html.="<div id='cleantalk_footer_link' style='width:100%;text-align:center;'><a href='https://cleantalk.org/ips-cs-4-anti-spam-plugin'>IPS spam</a> blocked by CleanTalk.</div>";
-						setcookie('ct_prev_referer', $_SERVER['HTTP_REFERER'], 0, '/');
+						$this->setCookie();
 						$this->endBodyCode.=$html;
 						return $title;
 					}
@@ -286,7 +306,24 @@
 							throw $e;
 					}
 				}
-				
+			    public function setCookie()
+			    {
+			        // Cookie names to validate
+			        $cookie_test_value = array(
+			            'cookies_names' => array(),
+			            'check_value' => trim(\IPS\Settings::i()->access_key),
+			        );
+			        // Pervious referer
+			        if(!empty($_SERVER['HTTP_REFERER'])){
+			            setcookie('ct_prev_referer', $_SERVER['HTTP_REFERER'], 0, '/');
+			            $cookie_test_value['cookies_names'][] = 'ct_prev_referer';
+			            $cookie_test_value['check_value'] .= $_SERVER['HTTP_REFERER'];
+			        }           
+
+			        // Cookies test
+			        $cookie_test_value['check_value'] = md5($cookie_test_value['check_value']);
+			        setcookie('ct_cookies_test', json_encode($cookie_test_value), 0, '/');
+			    }				
 				public function CleantalkGetIP(){
 					try{
 						$result=Array();
