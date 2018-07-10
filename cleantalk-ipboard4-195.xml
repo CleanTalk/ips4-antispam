@@ -120,7 +120,7 @@
 										\IPS\Output::i()->sendOutput(
 											\IPS\Theme::i()->getTemplate( 'global', 'core' )->globalTemplate(
 												"Forbidden",
-													\IPS\Output::i()->error( 'Forbidden', $ct_result->comment, 1,""),
+													\IPS\Output::i()->error( $ct_result->comment, 'CleanTalk Spam protect', 1,""),
 												array( 
 													'app' => \IPS\Dispatcher::i()->application ? \IPS\Dispatcher::i()->application->directory : NULL,
 													'module' => \IPS\Dispatcher::i()->module ? \IPS\Dispatcher::i()->module->key : NULL,
