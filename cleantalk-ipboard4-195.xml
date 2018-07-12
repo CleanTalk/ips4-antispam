@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<plugin name="CleanTalk Spam protect" version_long="19500" version_human="1.9.5" author="CleanTalk" website="https://cleantalk.org" update_check=""><hooks><hook type="C" class="\IPS\Member" filename="registration"><![CDATA[//<?php
+<plugin name="CleanTalk Spam protect" version_long="19500" version_human="1.9.5" author="CleanTalk" website="https://cleantalk.org" update_check="https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/cleantalkspamprotect.json"><hooks><hook type="C" class="\IPS\Member" filename="registration"><![CDATA[//<?php
 
 			class hook13 extends _HOOK_CLASS_{
 				
@@ -816,25 +816,27 @@ class hook18 extends _HOOK_CLASS_
 										
 							if ($table->filter === 'members_filter_spam')
 							{
-								if (isset(\IPS\Settings::i()->ct_access_key) && \IPS\Settings::i()->ct_plugin_enabled)
+								if (\IPS\Settings::i()->ct_spam_check && isset(\IPS\Settings::i()->ct_access_key) && \IPS\Settings::i()->ct_plugin_enabled)
 								{
-									//Check users
-									$select = \IPS\Db::i()->select( 'member_id,email,ip_address','core_members');
-									$select = $select->setKeyField( 'member_id' );
-									$users = array();
-									foreach( $select as $member_id => $value )
-									    $users[] = $value;
-									if (count($users)>0)
-									{
-										foreach ($users as $key=>$value)
+									$spam_users = array();
+									$on_page = 25;	
+									$start = 0;								
+									do
+									{										
+										$select = \IPS\Db::i()->select( 'member_id,email,ip_address','core_members', null, null, array($start,$on_page));
+										$select = $select->setKeyField( 'member_id' );
+										$users = array();
+										foreach( $select as $member_id => $value )
+										    $users[] = $value;
+										if (count($users)> 0)
 										{
-											$data[$key][]=$value['email'];
-											$data[$key][]=$value['ip_address'];
-										}
-										for($i=0;$i<sizeof($data);$i++)
-									    {
-										    $error="";
-											$send=implode(',',$data[$i]);;
+											foreach ($users as $key=>$value)
+											{
+												$data[]=$value['email'];
+												$data[]=$value['ip_address'];
+											}
+
+											$send=implode(',',array_unique($data));;
 											$req="data=$send";
 											$opts = array(
 											    'http'=>array(
@@ -842,8 +844,10 @@ class hook18 extends _HOOK_CLASS_
 											        'content'=>$req,
 											    )
 											);
+
 											$context = stream_context_create($opts);
 											$result = @file_get_contents("https://api.cleantalk.org/?method_name=spam_check_cms&auth_key=".trim(\IPS\Settings::i()->ct_access_key), 0, $context);
+
 											$result=json_decode($result);
 											if(isset($result->error_message))
 											{
@@ -859,32 +863,35 @@ class hook18 extends _HOOK_CLASS_
 														{
 															if($value->appears==1)
 															{
-																$spam_array[] = $users[$i];
+																if (!in_array($key, $spam_users['ip']))
+																	$spam_users['ip'][] = $key;
 															}
 														}
 														else
 														{
 															if($value->appears==1)
 															{
-																$spam_array[] = $users[$i];
+																if (!in_array($key, $spam_users['email']))
+																	$spam_users['email'][] = $key;
 															}
 														}
 													}
 												}
-											}
-										}
-										if (count($spam_array) > 0)
+											}																					
+										}	
+										$start = $on_page + $start;							
+										foreach ($users as $key=>$value)
 										{
-											foreach ($spam_array as $key=>$value)
+											if (in_array($value['email'], $spam_users['email']) || in_array($value['ip_address'], $spam_users['ip']))
 												\IPS\Db::i()->update( 'core_members', array( 'members_bitoptions' => '65537' ), array( 'member_id=?', $value['member_id']));
-										}										
-									}
+										}
+									}while (count($users) != 0);									
 								}
 
 							}
 							parent::manage();
-
 						}
+
 						catch ( \RuntimeException $e ){
 														
 							if ( method_exists( get_parent_class(), __FUNCTION__ ) )
@@ -894,7 +901,7 @@ class hook18 extends _HOOK_CLASS_
 							
 						}						
 					}
-}]]></hook></hooks><settings><setting><key>ct_access_key</key><default>0</default></setting><setting><key>ct_posts_to_check</key><default>10</default></setting><setting><key>ct_plugin_enabled</key><default>0</default></setting><setting><key>ct_moderate_new</key><default>0</default></setting><setting><key>ct_contact_form_check</key><default>0</default></setting><setting><key>ct_show_link</key><default>0</default></setting><setting><key>ct_cleantalk_sfw</key><default>0</default></setting><setting><key>ct_server_url</key><default>http://moderate.cleantalk.org</default></setting><setting><key>ct_work_url</key><default>0</default></setting><setting><key>ct_server_ttl</key><default>0</default></setting><setting><key>ct_server_changed</key><default>0</default></setting></settings><settingsCode><![CDATA[//<?php
+}]]></hook></hooks><settings><setting><key>ct_access_key</key><default>0</default></setting><setting><key>ct_posts_to_check</key><default>10</default></setting><setting><key>ct_plugin_enabled</key><default>0</default></setting><setting><key>ct_moderate_new</key><default>0</default></setting><setting><key>ct_contact_form_check</key><default>0</default></setting><setting><key>ct_show_link</key><default>0</default></setting><setting><key>ct_cleantalk_sfw</key><default>0</default></setting><setting><key>ct_server_url</key><default>http://moderate.cleantalk.org</default></setting><setting><key>ct_spam_check</key><default>0</default></setting><setting><key>ct_work_url</key><default>0</default></setting><setting><key>ct_server_ttl</key><default>0</default></setting><setting><key>ct_server_changed</key><default>0</default></setting></settings><settingsCode><![CDATA[//<?php
 
 		function CleantalkGetIP(){
 			
@@ -937,6 +944,7 @@ class hook18 extends _HOOK_CLASS_
 		$form->add( new \IPS\Helpers\Form\YesNo( 'ct_contact_form_check', \IPS\Settings::i()->ct_contact_form_check, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'ct_contact_form_check' ) ) );
 		$form->add( new \IPS\Helpers\Form\YesNo( 'ct_show_link', \IPS\Settings::i()->ct_show_link, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'ct_show_link' ) ) );
 		$form->add( new \IPS\Helpers\Form\YesNo( 'ct_cleantalk_sfw', (($sfw_file_ok && $sfw_table_ok) ? \IPS\Settings::i()->ct_cleantalk_sfw : 0), FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'ct_cleantalk_sfw', 'disabled' => !$sfw_file_ok ) ) );
+		$form->add( new \IPS\Helpers\Form\YesNo( 'ct_spam_check',\IPS\Settings::i()->ct_spam_check, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'ct_spam_check') ) );	
 		$form->add( new \IPS\Helpers\Form\Number( 'ct_posts_to_check', (empty(\IPS\Settings::i()->ct_posts_to_check) ? 10 : \IPS\Settings::i()->ct_posts_to_check), FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'ct_posts_to_check', 'min' => 1, 'max' => 10000) ) );
 		$form->add( new \IPS\Helpers\Form\Text( 'ct_access_key', (empty(\IPS\Settings::i()->ct_access_key) ? NULL : \IPS\Settings::i()->ct_access_key), FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'ct_access_key', 'placeholder' => 'Enter the key') ) );							
 		if ( $values = $form->values() ){
@@ -1052,7 +1060,7 @@ class hook18 extends _HOOK_CLASS_
 
 		}
 
-		return $form;]]></settingsCode><tasks/><widgets/><htmlFiles/><cssFiles/><jsFiles/><resourcesFiles/><lang><word key="ct_plugin_enabled" js="0">Enable CleanTalk</word><word key="ct_contact_form_check" js="0">Protect contact form</word><word key="ct_moderate_new" js="0">Moderate new users posts</word><word key="ct_access_key" js="0">Access key</word><word key="ct_posts_to_check" js="0">Do not check users with posts more than</word><word key="ct_show_link" js="0">Show link to CleanTalk</word><word key="ct_cleantalk_sfw" js="0">Enable SpamFireWall</word></lang><versions><version long="10000" human="1.5.0"><![CDATA[//<?php
+		return $form;]]></settingsCode><tasks/><widgets/><htmlFiles/><cssFiles/><jsFiles/><resourcesFiles/><lang><word key="ct_plugin_enabled" js="0">Enable CleanTalk</word><word key="ct_contact_form_check" js="0">Protect contact form</word><word key="ct_moderate_new" js="0">Moderate new users posts</word><word key="ct_access_key" js="0">Access key</word><word key="ct_posts_to_check" js="0">Do not check users with posts more than</word><word key="ct_show_link" js="0">Show link to CleanTalk</word><word key="ct_cleantalk_sfw" js="0">Enable SpamFireWall</word><word key="ct_spam_check" js="0">Check spam users via members list</word></lang><versions><version long="10000" human="1.5.0"><![CDATA[//<?php
 
 
 		/* To prevent PHP errors (extending class does not exist) revealing path */
