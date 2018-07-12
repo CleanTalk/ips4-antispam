@@ -9,7 +9,7 @@
 						$result=Array();
 						
 						for($i=-5;$i<=1;$i++){
-							$result[]=md5(\IPS\Settings::i()->access_key . '+' . \IPS\Settings::i()->email_in . date("Ymd",time()+86400*$i));
+							$result[]=md5(\IPS\Settings::i()->ct_access_key . '+' . \IPS\Settings::i()->email_in . date("Ymd",time()+86400*$i));
 						}
 						
 						return $result;
@@ -28,7 +28,7 @@
 			            
 			            $cookie_test = json_decode(stripslashes($_COOKIE['ct_cookies_test']), true);
 			            
-			            $check_srting = trim(\IPS\Settings::i()->access_key);
+			            $check_srting = trim(\IPS\Settings::i()->ct_access_key);
 			            foreach($cookie_test['cookies_names'] as $cookie_name){
 			                $check_srting .= isset($_COOKIE[$cookie_name]) ? $_COOKIE[$cookie_name] : '';
 			            } unset($cokie_name);
@@ -53,8 +53,8 @@
 					try{
 						
 						$new		= $this->_new;
-						$enabled=\IPS\Settings::i()->plugin_enabled;
-						$access_key=\IPS\Settings::i()->access_key;
+						$enabled=\IPS\Settings::i()->ct_plugin_enabled;
+						$ct_access_key=\IPS\Settings::i()->ct_access_key;
 						if($enabled==1&&$new){
 							
 							require_once(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/cleantalk.class.php");
@@ -92,7 +92,7 @@
 								$post_info = '';
 						
 					
-							$config_key = $access_key;
+							$config_key = $ct_access_key;
 							
 							$ct = new \Cleantalk();
 							$ct->server_url = \IPS\Settings::i()->ct_server_url;
@@ -111,7 +111,7 @@
 							$ct_request->sender_email = $sender_email;
 							$ct_request->sender_info = $post_info;
 							$ct_request->agent = 'ipboard4-195';
-							//$ct_request->js_on = $_COOKIE['ct_checkjs'] == md5(\IPS\Settings::i()->access_key . '+' . \IPS\Settings::i()->email_in) ? 1 : 0;
+							//$ct_request->js_on = $_COOKIE['ct_checkjs'] == md5(\IPS\Settings::i()->ct_access_key . '+' . \IPS\Settings::i()->email_in) ? 1 : 0;
 							$ct_request->js_on = in_array($_COOKIE['ct_checkjs'], self::getCheckJSArray()) ? 1 : 0;
 							$ct_request->submit_time = isset($_COOKIE['ct_ps_timestamp']) ? time() - intval($_COOKIE['ct_ps_timestamp']) : 0;
 							$ct_result = $ct->isAllowUser($ct_request);
@@ -177,12 +177,12 @@
 					
 					try{
 						
-						if(\IPS\Settings::i()->cleantalk_sfw == 1 && file_exists(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/cleantalk-sfw.class.php") && \IPS\Db::i()->checkForTable('cleantalk_sfw')){
+						if(\IPS\Settings::i()->ct_cleantalk_sfw == 1 && file_exists(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/cleantalk-sfw.class.php") && \IPS\Db::i()->checkForTable('ct_cleantalk_sfw')){
 							
 							$is_sfw_check=true;
 							$ip=$this->CleantalkGetIP();
 							$ip=array_unique($ip);
-							$key=\IPS\Settings::i()->access_key;
+							$key=\IPS\Settings::i()->ct_access_key;
 							for($i=0;$i<sizeof($ip);$i++){
 								
 								if(isset($_COOKIE['ct_sfw_pass_key']) && $_COOKIE['ct_sfw_pass_key']==md5($ip[$i].$key)){
@@ -205,7 +205,7 @@
 						}
 						
 						
-						$show_link=\IPS\Settings::i()->show_link;
+						$ct_show_link=\IPS\Settings::i()->ct_show_link;
 						$html = '
 							<script type="text/javascript">
 								function ctSetCookie(c_name, value) {
@@ -290,9 +290,9 @@
 									window.attachEvent("keydown", ctFunctionFirstKey);
 								}
 							</script>';
-						$ct_checkjs_key = md5(\IPS\Settings::i()->access_key . '+' . \IPS\Settings::i()->email_in . date("Ymd",time()));
+						$ct_checkjs_key = md5(\IPS\Settings::i()->ct_access_key . '+' . \IPS\Settings::i()->email_in . date("Ymd",time()));
 						$html = sprintf($html, $ct_checkjs_key);
-						if($show_link==1 && \IPS\Settings::i()->plugin_enabled)
+						if($ct_show_link==1 && \IPS\Settings::i()->ct_plugin_enabled)
 							$html.="<div id='cleantalk_footer_link' style='width:100%;text-align:center;'><a href='https://cleantalk.org/ips-cs-4-anti-spam-plugin'>IPS spam</a> blocked by CleanTalk.</div>";
 						$this->setCookie();
 						$this->endBodyCode.=$html;
@@ -311,7 +311,7 @@
 			        // Cookie names to validate
 			        $cookie_test_value = array(
 			            'cookies_names' => array(),
-			            'check_value' => trim(\IPS\Settings::i()->access_key),
+			            'check_value' => trim(\IPS\Settings::i()->ct_access_key),
 			        );
 			        // Pervious referer
 			        if(!empty($_SERVER['HTTP_REFERER'])){
@@ -372,8 +372,8 @@
 						
 						$comment_to_check = isset($_POST['topic_title']) ? $_POST['topic_title']."\n".trim(strip_tags($comment)) : trim(strip_tags($comment));
 						
-						$access_key=\IPS\Settings::i()->access_key;
-						if(isset($member) && !$member->isAdmin() && $member->member_posts <= \IPS\Settings::i()->posts_to_check && \IPS\Settings::i()->moderate_new==1){
+						$ct_access_key=\IPS\Settings::i()->ct_access_key;
+						if(isset($member) && !$member->isAdmin() && $member->member_posts <= \IPS\Settings::i()->ct_posts_to_check && \IPS\Settings::i()->ct_moderate_new==1){
 							
 							require_once(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/cleantalk.class.php");
 						
@@ -411,7 +411,7 @@
 								$post_info = '';
 						
 							
-							$config_key = $access_key;
+							$config_key = $ct_access_key;
 							
 							$ct = new \Cleantalk();
 							$ct->server_url = \IPS\Settings::i()->ct_server_url;
@@ -437,7 +437,7 @@
 							
 							$js_keys=Array();
 							for($i=-5;$i<=1;$i++){
-								$js_keys[]=md5(\IPS\Settings::i()->access_key . '+' . \IPS\Settings::i()->email_in . date("Ymd",time()+86400*$i));
+								$js_keys[]=md5(\IPS\Settings::i()->ct_access_key . '+' . \IPS\Settings::i()->email_in . date("Ymd",time()+86400*$i));
 							}
 							
 							$ct_request->js_on = in_array($_COOKIE['ct_checkjs'], $js_keys) ? 1 : 0;
@@ -601,7 +601,7 @@
 					protected function manage(){
 						try{
 							
-							$enabled 			= \IPS\Settings::i()->plugin_enabled;
+							$enabled 			= \IPS\Settings::i()->ct_plugin_enabled;
 							$contact_form_check 	= \IPS\Settings::i()->ct_contact_form_check;
 							
 							if($enabled && $contact_form_check){
@@ -667,7 +667,7 @@
 									$ct->server_changed = \IPS\Settings::i()->ct_server_changed;
 
 									$sender_ip = $ct->cleantalk_get_real_ip();
-									$config_key = \IPS\Settings::i()->access_key;
+									$config_key = \IPS\Settings::i()->ct_access_key;
 									
 									$js_keys=Array();
 									for($i=-5;$i<=1;$i++){
@@ -803,7 +803,98 @@
 						}
 					}
 				}
-			]]></hook></hooks><settings><setting><key>access_key</key><default>0</default></setting><setting><key>posts_to_check</key><default>10</default></setting><setting><key>plugin_enabled</key><default>0</default></setting><setting><key>moderate_new</key><default>0</default></setting><setting><key>ct_contact_form_check</key><default>0</default></setting><setting><key>show_link</key><default>0</default></setting><setting><key>cleantalk_sfw</key><default>0</default></setting><setting><key>ct_server_url</key><default>http://moderate.cleantalk.org</default></setting><setting><key>ct_work_url</key><default>0</default></setting><setting><key>ct_server_ttl</key><default>0</default></setting><setting><key>ct_server_changed</key><default>0</default></setting></settings><settingsCode><![CDATA[//<?php
+			]]></hook><hook type="C" class="\IPS\core\modules\admin\members\members" filename="mcheck"><![CDATA[//<?php
+
+class hook18 extends _HOOK_CLASS_
+{
+					protected function manage()
+					{
+						try
+						{		
+							/* Create the table */
+							$table = new \IPS\Helpers\Table\Db( 'core_members', \IPS\Http\Url::internal( 'app=core&module=members&controller=members' ), array( array( 'email<>?', '' ) ), 'joined' );
+										
+							if ($table->filter === 'members_filter_spam')
+							{
+								if (isset(\IPS\Settings::i()->ct_access_key) && \IPS\Settings::i()->ct_plugin_enabled)
+								{
+									//Check users
+									$select = \IPS\Db::i()->select( 'member_id,email,ip_address','core_members');
+									$select = $select->setKeyField( 'member_id' );
+									$users = array();
+									foreach( $select as $member_id => $value )
+									    $users[] = $value;
+									if (count($users)>0)
+									{
+										foreach ($users as $key=>$value)
+										{
+											$data[$key][]=$value['email'];
+											$data[$key][]=$value['ip_address'];
+										}
+										for($i=0;$i<sizeof($data);$i++)
+									    {
+										    $error="";
+											$send=implode(',',$data[$i]);;
+											$req="data=$send";
+											$opts = array(
+											    'http'=>array(
+											        'method'=>"POST",
+											        'content'=>$req,
+											    )
+											);
+											$context = stream_context_create($opts);
+											$result = @file_get_contents("https://api.cleantalk.org/?method_name=spam_check_cms&auth_key=".trim(\IPS\Settings::i()->ct_access_key), 0, $context);
+											$result=json_decode($result);
+											if(isset($result->error_message))
+											{
+												$error=$result->error_message;
+											}
+											else
+											{
+												if(isset($result->data))
+												{
+													foreach($result->data as $key=>$value)
+													{
+														if($key === filter_var($key, FILTER_VALIDATE_IP))
+														{
+															if($value->appears==1)
+															{
+																$spam_array[] = $users[$i];
+															}
+														}
+														else
+														{
+															if($value->appears==1)
+															{
+																$spam_array[] = $users[$i];
+															}
+														}
+													}
+												}
+											}
+										}
+										if (count($spam_array) > 0)
+										{
+											foreach ($spam_array as $key=>$value)
+												\IPS\Db::i()->update( 'core_members', array( 'members_bitoptions' => '65537' ), array( 'member_id=?', $value['member_id']));
+										}										
+									}
+								}
+
+							}
+							parent::manage();
+
+						}
+						catch ( \RuntimeException $e ){
+														
+							if ( method_exists( get_parent_class(), __FUNCTION__ ) )
+								return call_user_func_array( 'parent::' . __FUNCTION__, func_get_args() );
+							else
+								throw $e;
+							
+						}						
+					}
+}]]></hook></hooks><settings><setting><key>ct_access_key</key><default>0</default></setting><setting><key>ct_posts_to_check</key><default>10</default></setting><setting><key>ct_plugin_enabled</key><default>0</default></setting><setting><key>ct_moderate_new</key><default>0</default></setting><setting><key>ct_contact_form_check</key><default>0</default></setting><setting><key>ct_show_link</key><default>0</default></setting><setting><key>ct_cleantalk_sfw</key><default>0</default></setting><setting><key>ct_server_url</key><default>http://moderate.cleantalk.org</default></setting><setting><key>ct_work_url</key><default>0</default></setting><setting><key>ct_server_ttl</key><default>0</default></setting><setting><key>ct_server_changed</key><default>0</default></setting></settings><settingsCode><![CDATA[//<?php
 
 		function CleantalkGetIP(){
 			
@@ -836,30 +927,18 @@
 		if(!file_exists(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/cleantalk-sfw.class.php") || !file_exists(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/cleantalk.class.php")){
 			$form->addHeader('Missing core files! Please, download them directly from https://github.com/CleanTalk/ips4-antispam/tree/master/general/ and put into /your_root_folder/plugins/cleantalkspamprotect/');
 			$sfw_file_ok = FALSE;
-		}else if(! \IPS\Db::i()->checkForTable('cleantalk_sfw')){
+		}else if(! \IPS\Db::i()->checkForTable('ct_cleantalk_sfw')){
 			$form->addHeader('Spam FireWall feature is disabled because of missing table, enable it and save settings again, please');
 			$sfw_table_ok = FALSE;
 		}
 
-		$form->add( new \IPS\Helpers\Form\YesNo( 'plugin_enabled', \IPS\Settings::i()->plugin_enabled, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'plugin_enabled') ) );
-		$form->add( new \IPS\Helpers\Form\YesNo( 'moderate_new', \IPS\Settings::i()->moderate_new, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'moderate_new' ) ) );
+		$form->add( new \IPS\Helpers\Form\YesNo( 'ct_plugin_enabled', \IPS\Settings::i()->ct_plugin_enabled, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'ct_plugin_enabled') ) );
+		$form->add( new \IPS\Helpers\Form\YesNo( 'ct_moderate_new', \IPS\Settings::i()->ct_moderate_new, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'ct_moderate_new' ) ) );
 		$form->add( new \IPS\Helpers\Form\YesNo( 'ct_contact_form_check', \IPS\Settings::i()->ct_contact_form_check, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'ct_contact_form_check' ) ) );
-		$form->add( new \IPS\Helpers\Form\YesNo( 'show_link', \IPS\Settings::i()->show_link, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'show_link' ) ) );
-		$form->add( new \IPS\Helpers\Form\YesNo( 'cleantalk_sfw', (($sfw_file_ok && $sfw_table_ok) ? \IPS\Settings::i()->cleantalk_sfw : 0), FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'cleantalk_sfw', 'disabled' => !$sfw_file_ok ) ) );
-		$form->add( new \IPS\Helpers\Form\Number( 'posts_to_check', (empty(\IPS\Settings::i()->posts_to_check) ? 10 : \IPS\Settings::i()->posts_to_check), FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'posts_to_check', 'min' => 1, 'max' => 10000) ) );
-		$form->add( new \IPS\Helpers\Form\Text( 'access_key', (empty(\IPS\Settings::i()->access_key) ? NULL : \IPS\Settings::i()->access_key), FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'access_key', 'placeholder' => 'Enter the key') ) );						
-		//Check users
-		$select = \IPS\Db::i()->select( 'member_id,name,email,ip_address,joined,last_visit','core_members');
-		$select = $select->setKeyField( 'member_id' );
-		$users = array();
-		foreach( $select as $member_id => $value )
-		{
-		    $users[] = $value;
-
-		}	
-		$html="<center><a href=\"#\" id=\"check_spam\" onclick=\"$.ajax({type: 'POST', url: 'http://".$_SERVER['SERVER_NAME']."/plugins/cleantalkspamprotect/mcheck.php', data: '" . http_build_query(array('users' => $users)) . "&key=".(empty(\IPS\Settings::i()->access_key) ? NULL : base64_encode(\IPS\Settings::i()->access_key))."', success: function(data){ $('#results').html(data);}});\">Check users for spam</a></center>";
-		$html.="<div id=\"results\"></div>";
-		$form->addHtml($html);
+		$form->add( new \IPS\Helpers\Form\YesNo( 'ct_show_link', \IPS\Settings::i()->ct_show_link, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'ct_show_link' ) ) );
+		$form->add( new \IPS\Helpers\Form\YesNo( 'ct_cleantalk_sfw', (($sfw_file_ok && $sfw_table_ok) ? \IPS\Settings::i()->ct_cleantalk_sfw : 0), FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'ct_cleantalk_sfw', 'disabled' => !$sfw_file_ok ) ) );
+		$form->add( new \IPS\Helpers\Form\Number( 'ct_posts_to_check', (empty(\IPS\Settings::i()->ct_posts_to_check) ? 10 : \IPS\Settings::i()->ct_posts_to_check), FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'ct_posts_to_check', 'min' => 1, 'max' => 10000) ) );
+		$form->add( new \IPS\Helpers\Form\Text( 'ct_access_key', (empty(\IPS\Settings::i()->ct_access_key) ? NULL : \IPS\Settings::i()->ct_access_key), FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'ct_access_key', 'placeholder' => 'Enter the key') ) );							
 		if ( $values = $form->values() ){
 			require_once(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/cleantalk.class.php");
 			$values = $form->values();
@@ -872,7 +951,7 @@
 
 
 			$ct_request = new \CleantalkRequest();
-			$ct_request->auth_key = $values['access_key'];
+			$ct_request->auth_key = $values['ct_access_key'];
 			$ct_request->feedback = '0:ipboard4-195';
 			$ct->sendFeedback($ct_request);
 			if ($ct->server_change)
@@ -881,9 +960,9 @@
 				\IPS\Settings::i()->ct_server_ttl = $ct->server_ttl;
 				\IPS\Settings::i()->ct_server_changed = time();
 			}			
-			if($values['cleantalk_sfw'] == 1){
+			if($values['ct_cleantalk_sfw'] == 1){
 				\IPS\Db::i()->createTable( array(
-					'name'		=> 'cleantalk_sfw',
+					'name'		=> 'ct_cleantalk_sfw',
 					'columns'	=> array(
 						array(
 							'name'			=> 'network',
@@ -910,15 +989,15 @@
 					'if_not_exists' => TRUE
 				));
 
-				if ($sfw_file_ok && \IPS\Db::i()->checkForTable('cleantalk_sfw')) {
+				if ($sfw_file_ok && \IPS\Db::i()->checkForTable('ct_cleantalk_sfw')) {
 					$sfw_data_ok = TRUE;
 					try {
-						\IPS\Db::i()->delete('cleantalk_sfw');
+						\IPS\Db::i()->delete('ct_cleantalk_sfw');
 					} catch (Exception $e) {
 						$sfw_data_ok = FALSE;
 					}
 					if ($sfw_data_ok){
-						$data = Array(	'auth_key' => $values['access_key'],
+						$data = Array(	'auth_key' => $values['ct_access_key'],
 							'method_name' => '2s_blacklists_db'
 						);
 						$result=sendRawRequest('https://api.cleantalk.org/2.1',$data,false);
@@ -930,20 +1009,20 @@
 								array_push($swf_data_array, array('network' => $result[$i][0], 'mask' => $result[$i][1]));
 							}
 							try{
-								\IPS\Db::i()->insert('cleantalk_sfw', $swf_data_array);
+								\IPS\Db::i()->insert('ct_cleantalk_sfw', $swf_data_array);
 							} catch (Exception $e) {
-								$values['cleantalk_sfw'] = FALSE;
+								$values['ct_cleantalk_sfw'] = FALSE;
 							}
 						}
 					} else {
-						$values['cleantalk_sfw'] = FALSE;
+						$values['ct_cleantalk_sfw'] = FALSE;
 					}
 				} else {
-					$values['cleantalk_sfw'] = FALSE;
+					$values['ct_cleantalk_sfw'] = FALSE;
 				}
 			}
 			$data = array();
-			$data['auth_key'] = $_POST['access_key'];
+			$data['auth_key'] = $_POST['ct_access_key'];
 			$data['method_name'] = 'notice_validate_key';				
 			if(!function_exists('sendRawRequest')){
 				require_once(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/cleantalk.class.php");
@@ -973,7 +1052,7 @@
 
 		}
 
-		return $form;]]></settingsCode><tasks/><widgets/><htmlFiles/><cssFiles/><jsFiles/><resourcesFiles/><lang><word key="plugin_enabled" js="0">Enable CleanTalk</word><word key="ct_contact_form_check" js="0">Protect contact form</word><word key="moderate_new" js="0">Moderate new users posts</word><word key="access_key" js="0">Access key</word><word key="posts_to_check" js="0">Do not check users with posts more than</word><word key="show_link" js="0">Show link to CleanTalk</word><word key="cleantalk_sfw" js="0">Enable SpamFireWall</word></lang><versions><version long="10000" human="1.5.0"><![CDATA[//<?php
+		return $form;]]></settingsCode><tasks/><widgets/><htmlFiles/><cssFiles/><jsFiles/><resourcesFiles/><lang><word key="ct_plugin_enabled" js="0">Enable CleanTalk</word><word key="ct_contact_form_check" js="0">Protect contact form</word><word key="ct_moderate_new" js="0">Moderate new users posts</word><word key="ct_access_key" js="0">Access key</word><word key="ct_posts_to_check" js="0">Do not check users with posts more than</word><word key="ct_show_link" js="0">Show link to CleanTalk</word><word key="ct_cleantalk_sfw" js="0">Enable SpamFireWall</word></lang><versions><version long="10000" human="1.5.0"><![CDATA[//<?php
 
 
 		/* To prevent PHP errors (extending class does not exist) revealing path */
@@ -1029,24 +1108,10 @@
 				if(file_put_contents(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/sfw_die_page.html" , $file) === FALSE){
 					return FALSE;
 				}
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/mcheck.php');
-				if($file === FALSE){
-					return FALSE;
-				}
-				if(file_put_contents(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/mcheck.php" , $file) === FALSE){
-					return FALSE;
-				}
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/updatedb.php');
-				if($file === FALSE){
-					return FALSE;
-				}
-				if(file_put_contents(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/updatedb.php" , $file) === FALSE){
-					return FALSE;
-				}
 
-				\IPS\Db::i()->dropTable('cleantalk_sfw', TRUE);
+				\IPS\Db::i()->dropTable('ct_cleantalk_sfw', TRUE);
 				\IPS\Db::i()->createTable( array(
-					'name'		=> 'cleantalk_sfw',
+					'name'		=> 'ct_cleantalk_sfw',
 					'columns'	=> array(
 						array(
 							'name'			=> 'network',
@@ -1123,24 +1188,10 @@ class ips_plugins_setup_upg_19100
 				if(file_put_contents(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/sfw_die_page.html" , $file) === FALSE){
 					return FALSE;
 				}
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/mcheck.php');
-				if($file === FALSE){
-					return FALSE;
-				}
-				if(file_put_contents(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/mcheck.php" , $file) === FALSE){
-					return FALSE;
-				}
-				$file = file_get_contents('https://raw.githubusercontent.com/CleanTalk/ips4-antispam/master/general/updatedb.php');
-				if($file === FALSE){
-					return FALSE;
-				}
-				if(file_put_contents(\IPS\ROOT_PATH."/plugins/cleantalkspamprotect/updatedb.php" , $file) === FALSE){
-					return FALSE;
-				}
 
-				\IPS\Db::i()->dropTable('cleantalk_sfw', TRUE);
+				\IPS\Db::i()->dropTable('ct_cleantalk_sfw', TRUE);
 				\IPS\Db::i()->createTable( array(
-					'name'		=> 'cleantalk_sfw',
+					'name'		=> 'ct_cleantalk_sfw',
 					'columns'	=> array(
 						array(
 							'name'			=> 'network',
