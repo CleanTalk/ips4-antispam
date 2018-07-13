@@ -52,10 +52,10 @@ class CleanTalkSFW
 	public function check_ip()
 	{
 		$passed_ip='';
-		global $smcFunc;
+		
 		for($i=0;$i<sizeof($this->ip_array);$i++)
 		{
-			$result = IPS\Db::i()->select('count(network)', 'cleantalk_sfw', "network = ".$this->ip_array[$i]." & mask", "", 1);
+			$result = IPS\Db::i()->select('count(network)', 'ct_cleantalk_sfw', "network = ".$this->ip_array[$i]." & mask", "", 1);
 			$cnt = $result->first();
 
 			if($cnt>0)
@@ -70,14 +70,14 @@ class CleanTalkSFW
 		}
 		if($passed_ip!='')
 		{
-			$key=\IPS\Settings::i()->access_key;
+			$key=\IPS\Settings::i()->ct_access_key;
 			@setcookie ('ct_sfw_pass_key', md5($passed_ip.$key), 0, "/");
 		}
 	}
 	
 	public function sfw_die()
 	{
-		$key=\IPS\Settings::i()->access_key;
+		$key=\IPS\Settings::i()->ct_access_key;
 		$sfw_die_page=file_get_contents(dirname(__FILE__)."/sfw_die_page.html");
 		$sfw_die_page=str_replace("{REMOTE_ADDRESS}",$this->blocked_ip,$sfw_die_page);
 		$sfw_die_page=str_replace("{REQUEST_URI}",$_SERVER['REQUEST_URI'],$sfw_die_page);
