@@ -4,23 +4,14 @@
 			class hook13 extends _HOOK_CLASS_{
 				
 				public function getCheckJSArray(){
-					try{
 						
-						$result=Array();
-						
-						for($i=-5;$i<=1;$i++){
-							$result[]=md5(\IPS\Settings::i()->ct_access_key . '+' . \IPS\Settings::i()->email_in . date("Ymd",time()+86400*$i));
-						}
-						
-						return $result;
+					$result=Array();
+					
+					for($i=-5;$i<=1;$i++){
+						$result[]=md5(\IPS\Settings::i()->ct_access_key . '+' . \IPS\Settings::i()->email_in . date("Ymd",time()+86400*$i));
 					}
-					catch ( \RuntimeException $e ){
-						
-						if ( method_exists( get_parent_class(), __FUNCTION__ ) )
-							return call_user_func_array( 'parent::' . __FUNCTION__, func_get_args() );
-						else
-							throw $e;
-					}
+					
+					return $result;
 				}
 			    public function ctCookiesTest()
 			    {   
@@ -326,37 +317,29 @@
 			        setcookie('ct_cookies_test', json_encode($cookie_test_value), 0, '/');
 			    }				
 				public function CleantalkGetIP(){
-					try{
-						$result=Array();
-						
-						if ( function_exists( 'apache_request_headers' ) )
-							$headers = apache_request_headers();
-						else
-							$headers = $_SERVER;
-
-						if ( array_key_exists( 'X-Forwarded-For', $headers ) ){
-							$the_ip=explode(",", trim($headers['X-Forwarded-For']));
-							$result[] = trim($the_ip[0]);
-						}
-						
-						if ( array_key_exists( 'HTTP_X_FORWARDED_FOR', $headers )){
-							$the_ip=explode(",", trim($headers['HTTP_X_FORWARDED_FOR']));
-							$result[] = trim($the_ip[0]);
-						}
-						
-						$result[] = filter_var( $_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 );
+					$result=Array();
 					
-						if(isset($_GET['sfw_test_ip']))
-							$result[]=$_GET['sfw_test_ip'];
-						
-						return $result;
+					if ( function_exists( 'apache_request_headers' ) )
+						$headers = apache_request_headers();
+					else
+						$headers = $_SERVER;
+
+					if ( array_key_exists( 'X-Forwarded-For', $headers ) ){
+						$the_ip=explode(",", trim($headers['X-Forwarded-For']));
+						$result[] = trim($the_ip[0]);
 					}
-					catch ( \RuntimeException $e ){			
-						if ( method_exists( get_parent_class(), __FUNCTION__ ) )
-							return call_user_func_array( 'parent::' . __FUNCTION__, func_get_args() );
-						else
-							throw $e;
+					
+					if ( array_key_exists( 'HTTP_X_FORWARDED_FOR', $headers )){
+						$the_ip=explode(",", trim($headers['HTTP_X_FORWARDED_FOR']));
+						$result[] = trim($the_ip[0]);
 					}
+					
+					$result[] = filter_var( $_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 );
+				
+					if(isset($_GET['sfw_test_ip']))
+						$result[]=$_GET['sfw_test_ip'];
+					
+					return $result;
 				}
 			}]]></hook><hook type="C" class="\IPS\Content\Comment" filename="comment"><![CDATA[//<?php
 
@@ -903,32 +886,6 @@ class hook18 extends _HOOK_CLASS_
 						}						
 					}
 }]]></hook></hooks><settings><setting><key>ct_access_key</key><default>0</default></setting><setting><key>ct_posts_to_check</key><default>10</default></setting><setting><key>ct_plugin_enabled</key><default>0</default></setting><setting><key>ct_moderate_new</key><default>0</default></setting><setting><key>ct_contact_form_check</key><default>0</default></setting><setting><key>ct_show_link</key><default>0</default></setting><setting><key>ct_cleantalk_sfw</key><default>0</default></setting><setting><key>ct_server_url</key><default>http://moderate.cleantalk.org</default></setting><setting><key>ct_spam_check</key><default>0</default></setting><setting><key>ct_cleantalk_show_banner</key><default>0</default></setting><setting><key>ct_work_url</key><default>0</default></setting><setting><key>ct_server_ttl</key><default>0</default></setting><setting><key>ct_server_changed</key><default>0</default></setting></settings><settingsCode><![CDATA[//<?php
-
-		function CleantalkGetIP(){
-			
-			$result=Array();
-			if ( function_exists( 'apache_request_headers' ) )
-				$headers = apache_request_headers();
-			else
-				$headers = $_SERVER;
-			
-			if ( array_key_exists( 'X-Forwarded-For', $headers ) ){
-				$the_ip=explode(",", trim($headers['X-Forwarded-For']));
-				$result[] = trim($the_ip[0]);
-			}
-			
-			if ( array_key_exists( 'HTTP_X_FORWARDED_FOR', $headers )){
-				$the_ip=explode(",", trim($headers['HTTP_X_FORWARDED_FOR']));
-				$result[] = trim($the_ip[0]);
-			}
-			
-			$result[] = filter_var( $_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 );
-
-			if(isset($_GET['sfw_test_ip']))
-				$result[]=$_GET['sfw_test_ip'];
-			
-			return $result;
-		}
 
 		$sfw_file_ok = TRUE;
 		$sfw_table_ok = TRUE;
