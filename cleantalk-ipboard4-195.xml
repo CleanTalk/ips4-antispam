@@ -426,7 +426,7 @@
 							
 							$ct_request->js_on = in_array($_COOKIE['ct_checkjs'], $js_keys) ? 1 : 0;
 							$ct_request->submit_time = isset($_COOKIE['ct_ps_timestamp']) ? time() - intval($_COOKIE['ct_ps_timestamp']) : 0;
-							$ct_request->message = $comment_to_check;
+							$ct_request->message = trim(preg_replace("/(^[\r\n]*|[\r\n]+)[\s\t]*[\r\n]+/","\n", $comment_to_check));
 					
 							$ct_result = $ct->isAllowMessage($ct_request);
 							if ($ct->server_change)
@@ -801,8 +801,7 @@ class hook18 extends _HOOK_CLASS_
 							if ($table->filter === 'members_filter_spam')
 							{
 								if (\IPS\Settings::i()->ct_spam_check && isset(\IPS\Settings::i()->ct_access_key) && \IPS\Settings::i()->ct_plugin_enabled)
-								{
-									$spam_users = array();
+								{									
 									$on_page = 25;	
 									$start = 0;								
 									do
@@ -810,6 +809,7 @@ class hook18 extends _HOOK_CLASS_
 										$select = \IPS\Db::i()->select( 'member_id,email,ip_address','core_members', null, null, array($start,$on_page));
 										$select = $select->setKeyField( 'member_id' );
 										$users = array();
+										$spam_users = array();
 										foreach( $select as $member_id => $value )
 										    $users[] = $value;
 										if (count($users)> 0)
