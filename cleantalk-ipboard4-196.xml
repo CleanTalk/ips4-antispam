@@ -132,7 +132,7 @@
 										\IPS\Output::i()->sendOutput(
 											\IPS\Theme::i()->getTemplate( 'global', 'core' )->globalTemplate(
 												"Forbidden",
-													\IPS\Output::i()->error( $ct_result->comment, 'Antispam by Cleantalk', 1,""),
+													\IPS\Output::i()->error( $ct_result->comment, 'Antispam by Cleantalk', 403,""),
 												array( 
 													'app' => \IPS\Dispatcher::i()->application ? \IPS\Dispatcher::i()->application->directory : NULL,
 													'module' => \IPS\Dispatcher::i()->module ? \IPS\Dispatcher::i()->module->key : NULL,
@@ -458,7 +458,7 @@
 										\IPS\Output::i()->sendOutput(
 											\IPS\Theme::i()->getTemplate( 'global', 'core' )->globalTemplate(
 												"Forbidden",
-												\IPS\Theme::i()->getTemplate( 'global', 'core' )->error( "Forbidden", $ct_result->comment, 1, "" ),
+												\IPS\Theme::i()->getTemplate( 'global', 'core' )->error( "Forbidden", $ct_result->comment, 403, "" ),
 												array( 
 													'app' => \IPS\Dispatcher::i()->application ? \IPS\Dispatcher::i()->application->directory : NULL,
 													'module' => \IPS\Dispatcher::i()->module ? \IPS\Dispatcher::i()->module->key : NULL,
@@ -999,7 +999,7 @@ class hook18 extends _HOOK_CLASS_
 				$result = sendRawRequest('https://api.cleantalk.org',$data);
 				if (isset($result->errno))
 				{
-		 			\IPS\Output::i()->error( '', 'Cleantalk error - '.$result->curl_err, 1, '');
+		 			\IPS\Output::i()->error( '', 'Cleantalk error - '.$result->curl_err, 403, '');
 					return false;					
 				}
 				else
@@ -1012,7 +1012,7 @@ class hook18 extends _HOOK_CLASS_
 					}
 					else 
 					{
-			 			\IPS\Output::i()->error( '', 'Cleantalk error - Wrong access key!', 1, '');
+			 			\IPS\Output::i()->error( '', 'Cleantalk error - Wrong access key!', 403, '');
 						return false;
 					}					
 				}		
