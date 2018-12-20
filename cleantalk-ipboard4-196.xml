@@ -53,7 +53,7 @@
 							
 							
 					
-							$post_info = '';
+							$sender_info = ''; $post_info = '';
 							$lang=\IPS\Lang::getEnabledLanguages();
 							$locale=$lang[\IPS\Lang::defaultLanguage()]->short;
 							
@@ -78,11 +78,18 @@
 									'REFFERRER_PREVIOUS' => isset($_COOKIE['ct_prev_referer'])?$_COOKIE['ct_prev_referer']:null,
 									'cookies_enabled' => self::ctCookiesTest(),
 								);
-								$post_info = json_encode($arr);
+								$sender_info = json_encode($arr);
+
+								$arr = array(
+									'comment_type' => 'register',
+								);
+
+								$post_info = json_encode($arr);								
 							}
+							if($sender_info === FALSE)
+								$sender_info = '';
 							if($post_info === FALSE)
 								$post_info = '';
-						
 					
 							$config_key = $ct_access_key;
 							
@@ -101,7 +108,8 @@
 							$ct_request->sender_nickname = $_POST['username'];
 							$ct_request->sender_ip = $sender_ip;
 							$ct_request->sender_email = $sender_email;
-							$ct_request->sender_info = $post_info;
+							$ct_request->sender_info = $sender_info;
+							$ct_request->post_info = $post_info;
 							$ct_request->agent = 'ipboard4-196';
 							//$ct_request->js_on = $_COOKIE['ct_checkjs'] == md5(\IPS\Settings::i()->ct_access_key . '+' . \IPS\Settings::i()->email_in) ? 1 : 0;
 							$ct_request->js_on = in_array($_COOKIE['ct_checkjs'], self::getCheckJSArray()) ? 1 : 0;
@@ -383,7 +391,7 @@
 							require_once(\IPS\ROOT_PATH."/plugins/antispambycleantalk/cleantalk.class.php");
 						
 					
-							$post_info = '';
+							$sender_info = ''; $post_info = '';
 							$lang=\IPS\Lang::getEnabledLanguages();
 							$locale=$lang[\IPS\Lang::defaultLanguage()]->short;
 							
@@ -410,12 +418,19 @@
 									'cookies_enabled' => self::ctCookiesTest(),
 								);
 								
+								$sender_info = json_encode($arr);
+
+								$arr = array(
+									'comment_type' => 'comment',
+								);
+
 								$post_info = json_encode($arr);
 							}
 							
+							if($sender_info === FALSE)
+								$sender_info = '';
 							if($post_info === FALSE)
 								$post_info = '';
-						
 							
 							$config_key = $ct_access_key;
 							
@@ -438,7 +453,8 @@
 							
 							$ct_request->sender_ip = $sender_ip;
 							$ct_request->sender_email = $sender_email;
-							$ct_request->sender_info = $post_info;
+							$ct_request->sender_info = $sender_info;
+							$ct_request->post_info = $post_info;
 							$ct_request->agent = 'ipboard4-196';
 							
 							$js_keys=Array();
@@ -656,7 +672,7 @@
 									require_once(\IPS\ROOT_PATH."/plugins/antispambycleantalk/cleantalk.class.php");
 									
 							
-									$post_info = '';
+									$sender_info = ''; $post_info = '';
 									$lang=\IPS\Lang::getEnabledLanguages();
 									$locale=$lang[\IPS\Lang::defaultLanguage()]->short;
 									
@@ -680,12 +696,19 @@
 											'cookies_enabled' => self::ctCookiesTest(),
 										);
 										
-										$post_info = json_encode($arr);
+										$sender_info = json_encode($arr);
+
+										$arr = array(
+											'comment_type' => 'contact',
+										);
+
+										$post_info = json_encode($arr);										
 									}
 									
+									if($sender_info === FALSE)
+										$sender_info = '';
 									if($post_info === FALSE)
-										$post_info = '';
-																		
+										$post_info = '';									
 									$ct = new \Cleantalk();
 									$ct->server_url = \IPS\Settings::i()->ct_server_url;
 									$ct->work_url = \IPS\Settings::i()->ct_work_url;
@@ -702,7 +725,7 @@
 									
 									$request_summary = implode(", ", array(
 										'sender_ip' 		=> $sender_ip,
-										'sender_info' 		=> $post_info,
+										'sender_info' 		=> $sender_info,
 										'js_on' 			=> (in_array($_COOKIE['ct_checkjs'], $js_keys) ? 1 : 0),
 										'sender_nickname' 	=> ($member->member_id ? $member->name : $values['contact_name']),
 										'sender_email' 		=> ($member->member_id ? $member->email : $values['email_address']),
@@ -716,7 +739,8 @@
 									$ct_request->sender_ip 			= $sender_ip;
 									$ct_request->sender_nickname 	= ($member->member_id ? $member->name : $values['contact_name']);
 									$ct_request->sender_email 		= ($member->member_id ? $member->email : $values['email_address']);
-									$ct_request->sender_info 		= $post_info;
+									$ct_request->sender_info 		= $sender_info;
+									$ct_request->post_info          = $post_info;
 									$ct_request->agent 				= 'ipboard4-196';
 									$ct_request->js_on 				= in_array($_COOKIE['ct_checkjs'], $js_keys) ? 1 : 0;
 									$ct_request->submit_time 		= isset($_COOKIE['ct_ps_timestamp']) ? time() - intval($_COOKIE['ct_ps_timestamp']) : 0;
