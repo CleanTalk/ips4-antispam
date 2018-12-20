@@ -344,6 +344,27 @@
 			}]]></hook><hook type="C" class="\IPS\Content\Comment" filename="comment"><![CDATA[//<?php
 
 			abstract class hook15 extends _HOOK_CLASS_{
+
+			    public function ctCookiesTest()
+			    {   
+			        if(isset($_COOKIE['ct_cookies_test'])){
+			            
+			            $cookie_test = json_decode(stripslashes($_COOKIE['ct_cookies_test']), true);
+			            
+			            $check_srting = trim(\IPS\Settings::i()->ct_access_key);
+			            foreach($cookie_test['cookies_names'] as $cookie_name){
+			                $check_srting .= isset($_COOKIE[$cookie_name]) ? $_COOKIE[$cookie_name] : '';
+			            } unset($cokie_name);
+			            
+			            if($cookie_test['check_value'] == md5($check_srting)){
+			                return 1;
+			            }else{
+			                return 0;
+			            }
+			        }else{
+			            return null;
+			        }
+			    }
 				
 				public static function create( $item, $comment, $first=FALSE, $guestName=NULL, $incrementPostCount=NULL, $member=NULL, \IPS\DateTime $time=NULL ){
 					
@@ -385,7 +406,8 @@
 									'js_timezone' => $js_timezone,
 									'key_press_timestamp' => $first_key_press_timestamp,
 									'page_set_timestamp' => $page_set_timestamp,
-									'REFFERRER_PREVIOUS' => isset($_COOKIE['ct_prev_referer'])?$_COOKIE['ct_prev_referer']:null
+									'REFFERRER_PREVIOUS' => isset($_COOKIE['ct_prev_referer'])?$_COOKIE['ct_prev_referer']:null,
+									'cookies_enabled' => self::ctCookiesTest(),
 								);
 								
 								$post_info = json_encode($arr);
@@ -450,8 +472,7 @@
 									
 									if ( \IPS\Request::i()->isAjax() ){
 										$result=Array("type"=>"error","message"=>$ct_result->comment);
-										$result=json_encode($result);
-										\IPS\Output::i()->sendOutput( $result, 200, "application/json" );
+										\IPS\Output::i()->json($result);
 									}else{
 										\IPS\Output::i()->sidebar['enabled'] = FALSE;
 										/*
@@ -582,6 +603,26 @@
 
 				class hook17 extends _HOOK_CLASS_ {
 
+				    public function ctCookiesTest()
+				    {   
+				        if(isset($_COOKIE['ct_cookies_test'])){
+				            
+				            $cookie_test = json_decode(stripslashes($_COOKIE['ct_cookies_test']), true);
+				            
+				            $check_srting = trim(\IPS\Settings::i()->ct_access_key);
+				            foreach($cookie_test['cookies_names'] as $cookie_name){
+				                $check_srting .= isset($_COOKIE[$cookie_name]) ? $_COOKIE[$cookie_name] : '';
+				            } unset($cokie_name);
+				            
+				            if($cookie_test['check_value'] == md5($check_srting)){
+				                return 1;
+				            }else{
+				                return 0;
+				            }
+				        }else{
+				            return null;
+				        }
+				    }
 					protected function manage(){
 						try{
 							
@@ -635,7 +676,8 @@
 											'js_timezone' => $js_timezone,
 											'key_press_timestamp' => $first_key_press_timestamp,
 											'page_set_timestamp' => $page_set_timestamp,
-											'REFFERRER_PREVIOUS' => isset($_COOKIE['ct_prev_referer'])?$_COOKIE['ct_prev_referer']:null
+											'REFFERRER_PREVIOUS' => isset($_COOKIE['ct_prev_referer'])?$_COOKIE['ct_prev_referer']:null,
+											'cookies_enabled' => self::ctCookiesTest(),
 										);
 										
 										$post_info = json_encode($arr);
@@ -705,8 +747,7 @@
 											if ( \IPS\Request::i()->isAjax() )
 											{
 												$result=Array("type"=>"error","message"=>$ct_result->comment);
-												$result=json_encode($result);
-												\IPS\Output::i()->sendOutput( $result, 200, "application/json" );											
+												\IPS\Output::i()->json($result);											
 											}
 											else
 											{
