@@ -382,9 +382,7 @@
 						
 						if ( $member === NULL )
 							$member = \IPS\Member::loggedIn();
-						$permissionCheckFunction = \in_array( 'IPS\Content\Review', class_parents( \get_called_class() ) ) ? 'canReview' : 'canComment';
-						if ( !$member->member_id and !$item->$permissionCheckFunction( $member, FALSE ) )
-							return call_user_func_array( 'parent::create', func_get_args() );
+
 						$comment_to_check = isset($_POST['topic_title']) ? $_POST['topic_title']."\n".trim(strip_tags($comment)) : trim(strip_tags($comment));
 						
 						$ct_access_key=\IPS\Settings::i()->ct_access_key;
@@ -442,7 +440,7 @@
 							$ct->server_ttl = \IPS\Settings::i()->ct_server_ttl;
 							$ct->server_changed = \IPS\Settings::i()->ct_server_changed;
 							
-							$sender_email = filter_var($member->email, FILTER_SANITIZE_EMAIL);
+							$sender_email = isset($_POST['guest_email']) ? filter_var($_POST['guest_email'], FILTER_SANITIZE_EMAIL) : filter_var($member->email, FILTER_SANITIZE_EMAIL);
 							$sender_ip = $ct->cleantalk_get_real_ip();
 					
 							$ct_request = new \CleantalkRequest();
