@@ -349,6 +349,60 @@
 					
 					return $result;
 				}
+				public function ctRemoteCalls()
+				{
+					$remote_action = $_GET['spbc_remote_call_action'];
+
+					$remote_calls_config = json_decode(\IPS\Settings::i()->ct_remote_calls,true);
+
+					if ($remote_calls_config && is_array($remote_calls_config))
+					{
+						if (array_key_exists($remote_action, $remote_calls_config))
+						{
+							if (time() - $remote_calls_config[$remote_action] > 10)
+							{
+								$remote_calls_config[$remote_action] = time();
+								\IPS\Settings::i()->ct_remote_calls = $remote_calls_config;
+
+								if (strtolower($_GET['spbc_remote_call_token']) == strtolower(md5($this->app->options()->ct_apikey)))
+								{
+									// Close renew banner
+									if ($remote_action == 'close_renew_banner')
+									{
+										die('OK');
+										// SFW update
+									}
+									elseif ($remote_action == 'sfw_update')
+									{
+										$sfw = new \CleanTalkSFW();
+										$result = $sfw->sfw_update(trim(\IPS\Settings::i()->ct_access_key));
+										die(empty($result['error']) ? 'OK' : 'FAIL ' . json_encode(array('error' => $result['error_string'])));
+										// SFW send logs
+									}
+									elseif ($remote_action == 'sfw_send_logs')
+									{
+										$sfw = new \CleanTalkSFW();
+										$result = $sfw->send_logs(trim(\IPS\Settings::i()->ct_access_key));
+										die(empty($result['error']) ? 'OK' : 'FAIL ' . json_encode(array('error' => $result['error_string'])));
+										// Update plugin
+									}
+									elseif ($remote_action == 'update_plugin')
+									{
+										//add_action('wp', 'apbct_update', 1);
+									}
+									else
+										die('FAIL ' . json_encode(array('error' => 'UNKNOWN_ACTION_2')));
+								}
+								else
+									die('FAIL ' . json_encode(array('error' => 'WRONG_TOKEN')));
+							}
+							else
+								die('FAIL ' . json_encode(array('error' => 'TOO_MANY_ATTEMPTS')));
+						}
+						else
+							die('FAIL ' . json_encode(array('error' => 'UNKNOWN_ACTION')));
+					}
+				}				
 			}]]></hook><hook type="C" class="\IPS\Content\Comment" filename="comment"><![CDATA[//<?php
 
 			abstract class hook15 extends _HOOK_CLASS_{
@@ -952,7 +1006,7 @@ class hook18 extends _HOOK_CLASS_
 							
 						}						
 					}
-}]]></hook></hooks><settings><setting><key>ct_access_key</key><default>0</default></setting><setting><key>ct_posts_to_check</key><default>10</default></setting><setting><key>ct_plugin_enabled</key><default>0</default></setting><setting><key>ct_moderate_new</key><default>0</default></setting><setting><key>ct_contact_form_check</key><default>0</default></setting><setting><key>ct_show_link</key><default>0</default></setting><setting><key>ct_cleantalk_sfw</key><default>0</default></setting><setting><key>ct_server_url</key><default>http://moderate.cleantalk.org</default></setting><setting><key>ct_spam_check</key><default>0</default></setting><setting><key>ct_cleantalk_show_banner</key><default>0</default></setting><setting><key>ct_work_url</key><default>0</default></setting><setting><key>ct_server_ttl</key><default>0</default></setting><setting><key>ct_server_changed</key><default>0</default></setting></settings><settingsCode><![CDATA[//<?php
+}]]></hook></hooks><settings><setting><key>ct_access_key</key><default>0</default></setting><setting><key>ct_posts_to_check</key><default>10</default></setting><setting><key>ct_plugin_enabled</key><default>0</default></setting><setting><key>ct_moderate_new</key><default>0</default></setting><setting><key>ct_contact_form_check</key><default>0</default></setting><setting><key>ct_show_link</key><default>0</default></setting><setting><key>ct_cleantalk_sfw</key><default>0</default></setting><setting><key>ct_server_url</key><default>http://moderate.cleantalk.org</default></setting><setting><key>ct_spam_check</key><default>0</default></setting><setting><key>ct_cleantalk_show_banner</key><default>0</default></setting><setting><key>ct_work_url</key><default>0</default></setting><setting><key>ct_server_ttl</key><default>0</default></setting><setting><key>ct_server_changed</key><default>0</default></setting><setting><key>ct_remote_calls</key><default>{"close_renew_banner":"0","sfw_update":"0","sfw_send_logs":"0"}</default></setting></settings><settingsCode><![CDATA[//<?php
 
 		$sfw_file_ok = TRUE;
 		$sfw_table_ok = TRUE;
