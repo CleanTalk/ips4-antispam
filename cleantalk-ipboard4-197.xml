@@ -22,7 +22,7 @@
 			            $check_srting = trim(\IPS\Settings::i()->ct_access_key);
 			            foreach($cookie_test['cookies_names'] as $cookie_name){
 			                $check_srting .= isset($_COOKIE[$cookie_name]) ? $_COOKIE[$cookie_name] : '';
-			            } unset($cokie_name);
+			            } unset($cookie_name);
 			            
 			            if($cookie_test['check_value'] == md5($check_srting)){
 			                return 1;
@@ -416,7 +416,7 @@
 			            $check_srting = trim(\IPS\Settings::i()->ct_access_key);
 			            foreach($cookie_test['cookies_names'] as $cookie_name){
 			                $check_srting .= isset($_COOKIE[$cookie_name]) ? $_COOKIE[$cookie_name] : '';
-			            } unset($cokie_name);
+			            } unset($cookie_name);
 			            
 			            if($cookie_test['check_value'] == md5($check_srting)){
 			                return 1;
@@ -682,7 +682,7 @@
 				            $check_srting = trim(\IPS\Settings::i()->ct_access_key);
 				            foreach($cookie_test['cookies_names'] as $cookie_name){
 				                $check_srting .= isset($_COOKIE[$cookie_name]) ? $_COOKIE[$cookie_name] : '';
-				            } unset($cokie_name);
+				            } unset($cookie_name);
 				            
 				            if($cookie_test['check_value'] == md5($check_srting)){
 				                return 1;
