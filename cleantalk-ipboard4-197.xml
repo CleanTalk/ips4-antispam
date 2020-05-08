@@ -1110,33 +1110,25 @@ class hook18 extends _HOOK_CLASS_
 			}
 			$data = array();
 			$data['auth_key'] = $_POST['ct_access_key'];
-			$data['method_name'] = 'notice_validate_key';				
+			$data['method_name'] = 'notice_paid_till';				
 			if(!function_exists('sendRawRequest')){
 				require_once(\IPS\ROOT_PATH."/plugins/antispambycleantalk/cleantalk.class.php");
 			}
-			if (!empty($data['auth_key'])){
+			if (!empty($data['auth_key'])) {
 				$result = sendRawRequest('https://api.cleantalk.org',$data);
-				if (isset($result->errno))
-				{
+				if (isset($result->errno)) {
 		 			\IPS\Output::i()->error( '', 'Cleantalk error - '.$result->curl_err, 403, '');
 					return false;					
-				}
-				else
-				{
+				} else {
 					$result = json_decode(trim($result));
-					if ($result->valid === 1)
-					{
-						$form->saveAsSettings($values);
-						return TRUE;				
-					}
-					else 
-					{
-			 			\IPS\Output::i()->error( '', 'Cleantalk error - Wrong access key!', 403, '');
+					if ($result->data->valid === 0) {
+						\IPS\Output::i()->error( '', 'Cleantalk error - Wrong access key!', 403, '');
 						return false;
-					}					
+					}				
 				}		
 			}
-
+			$form->saveAsSettings($values);
+			return TRUE;	
 		}
 
 		return $form;]]></settingsCode><tasks/><widgets/><htmlFiles/><cssFiles/><jsFiles/><resourcesFiles/><lang><word key="ct_plugin_enabled" js="0">Enable plugin</word><word key="ct_contact_form_check" js="0">Protect contact form</word><word key="ct_moderate_new" js="0">Moderate new users posts</word><word key="ct_access_key" js="0">Access key</word><word key="ct_posts_to_check" js="0">Do not check users with posts more than</word><word key="ct_show_link" js="0">Show link to CleanTalk</word><word key="ct_cleantalk_sfw" js="0">Enable SpamFireWall</word><word key="ct_spam_check" js="0">Check spam users via members list</word></lang><versions><version long="10000" human="1.5.0"><![CDATA[//<?php
