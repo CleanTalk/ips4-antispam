@@ -70,8 +70,13 @@ class CleanTalkSFW
 		}
 		if($passed_ip!='')
 		{
+			$domain = isset( $_SERVER['HTTP_HOST'] )
+				? $_SERVER['HTTP_HOST']
+				: isset( $_SERVER['SERVER_NAME'] )
+					? $_SERVER['SERVER_NAME']
+					: null;
 			$key=\IPS\Settings::i()->ct_access_key;
-			@setcookie ('ct_sfw_pass_key', md5($passed_ip.$key), 0, "/");
+			@setcookie( 'ct_sfw_pass_key', md5( $passed_ip . $key ), 0, '/', '.' . $domain );
 		}
 	}
 	
