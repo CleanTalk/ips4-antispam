@@ -79,9 +79,12 @@ function get_current_url() {
             set_spamFireWallCookie('ct_sfw_pass_key','{SFW_COOKIE}');
             set_spamFireWallCookie('ct_sfw_passed','1');
         }, 50);
-        setTimeout(function(){
-            window.location.href=window.location.href + (window.location.search === '' ? '?sfw=pass' : '&sfw=pass');
-        }, reload_timeout);
+        if(location.search.search('debug=1') === -1) {
+            setTimeout(function () {
+                window.location.href = window.location.href + (window.location.search === '' ? '?sfw=pass' : '&sfw=pass');
+            }, reload_timeout);
+        }
     </script>
+    {DEBUG}
 </body>
 </html>
