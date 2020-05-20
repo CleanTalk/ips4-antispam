@@ -91,11 +91,11 @@ class CleanTalkSFW
 		$sfw_die_page=str_replace("{SFW_COOKIE}",md5($this->blocked_ip.$key),$sfw_die_page);
 		if(strpos( $_SERVER['REQUEST_URI'], 'debug') !== false ){
 			$debug = '<h1>IP and Networks</h1>'
-			         . var_export($this->all_ips, true)
+			         . var_export($this->ip_str_array, true)
 			         .'<h1>Blocked IPs</h1>'
-			         . var_export($this->blocked_ips, true)
+			         . var_export($this->blocked_ip, true)
 			         .'<h1>Passed IPs</h1>'
-			         . var_export($this->passed_ips, true)
+			         . var_export($this->passed_ip, true)
 			         . '<h1>Headers</h1>'
 			         . var_export(apache_request_headers(), true)
 			         . '<h1>REMOTE_ADDR</h1>'
