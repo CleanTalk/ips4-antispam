@@ -1,0 +1,178 @@
+{
+    "antispambycleantalk_sfw": {
+        "name": "antispambycleantalk_sfw",
+        "columns": {
+            "id": {
+                "name": "id",
+                "type": "INT",
+                "length": "20",
+                "decimals": null,
+                "values": null,
+                "allow_null": false,
+                "default": null,
+                "comment": "",
+                "unsigned": true,
+                "auto_increment": true
+            },
+            "network": {
+                "name": "network",
+                "type": "INT",
+                "length": "11",
+                "decimals": null,
+                "values": null,
+                "allow_null": false,
+                "default": null,
+                "comment": "",
+                "unsigned": true,
+                "auto_increment": false
+            },
+            "mask": {
+                "name": "mask",
+                "type": "INT",
+                "length": "11",
+                "decimals": null,
+                "values": null,
+                "allow_null": false,
+                "default": null,
+                "comment": "",
+                "unsigned": true,
+                "auto_increment": false
+            },
+            "status": {
+                "name": "status",
+                "type": "TINYINT",
+                "length": null,
+                "decimals": null,
+                "values": null,
+                "allow_null": false,
+                "default": "0",
+                "comment": "",
+                "unsigned": false,
+                "auto_increment": false
+            }
+        },
+        "indexes": {
+            "PRIMARY": {
+                "type": "primary",
+                "name": "PRIMARY",
+                "columns": [
+                    "id"
+                ],
+                "length": [
+                    null
+                ]
+            },
+            "network": {
+                "type": "key",
+                "name": "network",
+                "columns": [
+                    "network",
+                    "mask"
+                ],
+                "length": [
+                    null,
+                    null
+                ]
+            }
+        },
+        "comment": ""
+    },
+    "antispambycleantalk_sfw_logs": {
+        "name": "antispambycleantalk_sfw_logs",
+        "columns": {
+            "id": {
+                "name": "id",
+                "type": "VARCHAR",
+                "length": 40,
+                "decimals": null,
+                "values": null,
+                "allow_null": false,
+                "default": null,
+                "comment": "ID Number",
+                "unsigned": false,
+                "auto_increment": false
+            },
+            "ip": {
+                "name": "ip",
+                "type": "VARCHAR",
+                "length": 15,
+                "decimals": null,
+                "values": null,
+                "allow_null": false,
+                "default": null,
+                "comment": "",
+                "unsigned": false,
+                "auto_increment": false
+            },
+            "status": {
+                "name": "status",
+                "type": "ENUM",
+                "length": null,
+                "decimals": null,
+                "values": [
+                    "PASS_SFW",
+                    "DENY_SFW",
+                    "PASS_SFW__BY_WHITELIST",
+                    "PASS_SFW__BY_COOKIE",
+                    "DENY_ANTICRAWLER",
+                    "PASS_ANTICRAWLER",
+                    "DENY_ANTIFLOOD",
+                    "PASS_ANTIFLOOD"
+                ],
+                "allow_null": true,
+                "default": null,
+                "comment": "",
+                "unsigned": false,
+                "auto_increment": false
+            },
+            "all_entries": {
+                "name": "all_entries",
+                "type": "INT",
+                "length": "11",
+                "decimals": null,
+                "values": null,
+                "allow_null": false,
+                "default": null,
+                "comment": "",
+                "unsigned": false,
+                "auto_increment": false
+            },
+            "blocked_entries": {
+                "name": "blocked_entries",
+                "type": "INT",
+                "length": "11",
+                "decimals": null,
+                "values": null,
+                "allow_null": false,
+                "default": null,
+                "comment": "",
+                "unsigned": false,
+                "auto_increment": false
+            },
+            "entries_timestamp": {
+                "name": "entries_timestamp",
+                "type": "INT",
+                "length": "11",
+                "decimals": null,
+                "values": null,
+                "allow_null": false,
+                "default": null,
+                "comment": "",
+                "unsigned": false,
+                "auto_increment": false
+            }
+        },
+        "indexes": {
+            "PRIMARY": {
+                "type": "primary",
+                "name": "PRIMARY",
+                "columns": [
+                    "id"
+                ],
+                "length": [
+                    null
+                ]
+            }
+        }
+    }
+}

@@ -17,7 +17,7 @@ class CleanTalkSFW
 	
 	public function cleantalk_get_real_ip()
 	{
-		if ( function_exists( 'apache_request_headers' ) )
+		if ( \function_exists( 'apache_request_headers' ) )
 		{
 			$headers = apache_request_headers();
 		}
@@ -57,7 +57,7 @@ class CleanTalkSFW
 		
 		for($i=0;$i<sizeof($this->ip_array);$i++)
 		{
-			$result = IPS\Db::i()->select('count(network)', 'ct_cleantalk_sfw', "network = ".$this->ip_array[$i]." & mask", "", 1);
+			$result = IPS\Db::i()->select('count(network)', 'antispambycleantalk_sfw', "network = ".$this->ip_array[$i]." & mask", "", 1);
 			$cnt = $result->first();
 
 			if($cnt>0)
@@ -72,9 +72,9 @@ class CleanTalkSFW
 		}
 		if($passed_ip!='')
 		{
-			$domain = isset( $_SERVER['HTTP_HOST'] )
+			$domain = ( isset( $_SERVER['HTTP_HOST'] )
 				? $_SERVER['HTTP_HOST']
-				: isset( $_SERVER['SERVER_NAME'] )
+				: isset( $_SERVER['SERVER_NAME'] ) )
 					? $_SERVER['SERVER_NAME']
 					: null;
 			$key=\IPS\Settings::i()->ct_access_key;

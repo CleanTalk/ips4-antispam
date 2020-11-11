@@ -15,7 +15,7 @@
  /**
 * Creating apache_request_headers() if not exists
 */
-if( !function_exists('apache_request_headers') ) {
+if( ! \function_exists('apache_request_headers') ) {
 	function apache_request_headers() {
 	  $arh = array();
 	  $rx_http = '/\AHTTP_/';
@@ -489,20 +489,20 @@ class Cleantalk {
     private function filterRequest(CleantalkRequest &$request) {
         // general and optional
         foreach ($request as $param => $value) {
-            if (in_array($param, array('message', 'example', 'agent',
+            if (\in_array($param, array('message', 'example', 'agent',
                         'sender_info', 'sender_nickname', 'post_info', 'phone')) && !empty($value)) {
                 if (!is_string($value) && !is_integer($value)) {
                     $request->$param = NULL;
                 }
             }
 
-            if (in_array($param, array('stoplist_check', 'allow_links')) && !empty($value)) {
-                if (!in_array($value, array(1, 2))) {
+            if (\in_array($param, array('stoplist_check', 'allow_links')) && !empty($value)) {
+                if (!\in_array($value, array(1, 2))) {
                     $request->$param = NULL;
                 }
             }
             
-            if (in_array($param, array('js_on')) && !empty($value)) {
+            if (\in_array($param, array('js_on')) && !empty($value)) {
                 if (!is_integer($value)) {
                     $request->$param = NULL;
                 }
@@ -535,7 +535,7 @@ class Cleantalk {
      */
 	private function compressData($data = null){
 		
-		if (strlen($data) > $this->dataMaxSise && function_exists('gzencode') && function_exists('base64_encode')){
+		if (strlen($data) > $this->dataMaxSise && \function_exists('gzencode') && \function_exists('base64_encode')){
 
 			$localData = gzencode($data, $this->compressRate, FORCE_GZIP);
 
@@ -622,7 +622,7 @@ class Cleantalk {
 
         $result = false;
         $curl_error = null;
-		if(function_exists('curl_init')) {
+		if(\function_exists('curl_init')) {
             $ch = curl_init();
             curl_setopt($ch, CURLOPT_URL, $url);
             curl_setopt($ch, CURLOPT_TIMEOUT, $server_timeout);
@@ -656,7 +656,7 @@ class Cleantalk {
 
         if (!$result) {
             $allow_url_fopen = ini_get('allow_url_fopen');
-            if (function_exists('file_get_contents') && isset($allow_url_fopen) && $allow_url_fopen == '1') {
+            if (\function_exists('file_get_contents') && isset($allow_url_fopen) && $allow_url_fopen == '1') {
                 $opts = array('http' =>
                   array(
                     'method'  => 'POST',
@@ -819,7 +819,7 @@ class Cleantalk {
         if (!isset($host))
             return $response;
 
-        if (function_exists('dns_get_record')) {
+        if (\function_exists('dns_get_record')) {
             $records = dns_get_record($host, DNS_A);
 
             if ($records !== FALSE) {
@@ -829,7 +829,7 @@ class Cleantalk {
             }
         }
 
-        if (count($response) == 0 && function_exists('gethostbynamel')) {
+        if (count($response) == 0 && \function_exists('gethostbynamel')) {
             $records = gethostbynamel($host);
 
             if ($records !== FALSE) {
@@ -1010,7 +1010,7 @@ class Cleantalk {
     * @return string
     */
     function stringToUTF8($str, $data_codepage = null){
-        if (!preg_match('//u', $str) && function_exists('mb_detect_encoding') && function_exists('mb_convert_encoding')) {
+        if (!preg_match('//u', $str) && \function_exists('mb_detect_encoding') && \function_exists('mb_convert_encoding')) {
             
             if ($data_codepage !== null)
                 return mb_convert_encoding($str, 'UTF-8', $data_codepage);
@@ -1030,7 +1030,7 @@ class Cleantalk {
     * @return string
     */
     function stringFromUTF8($str, $data_codepage = null){
-        if (preg_match('//u', $str) && function_exists('mb_convert_encoding') && $data_codepage !== null) {
+        if (preg_match('//u', $str) && \function_exists('mb_convert_encoding') && $data_codepage !== null) {
             return mb_convert_encoding($str, $data_codepage, 'UTF-8');
         }
         
@@ -1055,7 +1055,7 @@ class Cleantalk {
     {
 
         // Getting headers
-        $headers = function_exists('apache_request_headers') ? apache_request_headers() : $_SERVER;
+        $headers = \function_exists('apache_request_headers') ? \apache_request_headers() : $_SERVER;
 
         // Getting IP for validating
         if (array_key_exists( 'X-Forwarded-For', $headers )){
@@ -1093,7 +1093,7 @@ class Cleantalk {
  * @return type
  */
 
-if(!function_exists('getAutoKey'))
+if(! \function_exists('getAutoKey'))
 {
 	function getAutoKey($email, $host, $platform)
 	{
@@ -1148,7 +1148,7 @@ function sendRawRequest($url,$data,$isJSON=false,$timeout=15)
         $data= json_encode($data);
     }
     $curl_error = null;
-    if (function_exists('curl_init') && function_exists('json_decode'))
+    if (\function_exists('curl_init') && \function_exists('json_decode'))
     {
     
         $ch = curl_init();
@@ -1173,7 +1173,7 @@ function sendRawRequest($url,$data,$isJSON=false,$timeout=15)
     if(!$result)
     {
         $allow_url_fopen = ini_get('allow_url_fopen');
-        if (function_exists('file_get_contents') && isset($allow_url_fopen) && $allow_url_fopen == '1')
+        if (\function_exists('file_get_contents') && isset($allow_url_fopen) && $allow_url_fopen == '1')
         {
             $opts = array(
                 'http'=>array(
@@ -1199,7 +1199,7 @@ function sendRawRequest($url,$data,$isJSON=false,$timeout=15)
     return $response;
 }
 
-if( !function_exists('apache_request_headers') )
+if( ! \function_exists('apache_request_headers') )
 {
 	function apache_request_headers()
 	{

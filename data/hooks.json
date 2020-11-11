@@ -1,0 +1,26 @@
+{
+    "registration": {
+        "type": "C",
+        "class": "\\IPS\\Member"
+    },
+    "sfw_js": {
+        "type": "C",
+        "class": "\\IPS\\Output"
+    },
+    "comment": {
+        "type": "C",
+        "class": "\\IPS\\Content\\Comment"
+    },
+    "admin_actions": {
+        "type": "S",
+        "class": "\\IPS\\Theme\\class_core_admin_global"
+    },
+    "mcheck": {
+        "type": "C",
+        "class": "\\IPS\\core\\modules\\admin\\members\\members"
+    },
+    "contact": {
+        "type": "C",
+        "class": "\\IPS\\core\\modules\\front\\contact\\contact"
+    }
+}

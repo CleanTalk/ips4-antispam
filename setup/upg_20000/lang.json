@@ -1,0 +1,24 @@
+{
+    "normal": {
+        "added": [
+            "__app_antispambycleantalk",
+            "ct_contact_form_check",
+            "ct_moderate_new",
+            "ct_access_key",
+            "ct_posts_to_check",
+            "ct_show_link",
+            "ct_cleantalk_sfw",
+            "ct_spam_check",
+            "antispambycleantalk_settings",
+            "menu__antispambycleantalk_antispambycleantalk",
+            "menu__antispambycleantalk_antispambycleantalk_settings"
+        ],
+        "edited": [],
+        "removed": []
+    },
+    "js": {
+        "added": [],
+        "edited": [],
+        "removed": []
+    }
+}

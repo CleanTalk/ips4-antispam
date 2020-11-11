@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language>
+ <app key="antispambycleantalk" version="20000">
+  <word key="__app_antispambycleantalk" js="0">Antispam by Cleantalk</word>
+  <word key="ct_contact_form_check" js="0">Protect contact form</word>
+  <word key="ct_moderate_new" js="0">Moderate new users posts</word>
+  <word key="ct_access_key" js="0">Access key</word>
+  <word key="ct_posts_to_check" js="0">Do not check users with posts more than</word>
+  <word key="ct_show_link" js="0">Show link to CleanTalk</word>
+  <word key="ct_cleantalk_sfw" js="0">Enable SpamFireWall</word>
+  <word key="ct_spam_check" js="0">Check spam users via members list</word>
+  <word key="antispambycleantalk_settings" js="0">Antispam by Cleantalk Settings</word>
+  <word key="menu__antispambycleantalk_antispambycleantalk" js="0">Antispam by Cleantalk</word>
+  <word key="menu__antispambycleantalk_antispambycleantalk_settings" js="0">Settings</word>
+  <word key="dashboard_key_is_empty_description" js="0">Please enter Access Key in Anti-Spam by CleanTalk settings to enable anti spam protection!</word>
+  <word key="go_to_settings" js="0">Settings</word>
+ </app>
+</language>

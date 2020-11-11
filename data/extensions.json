@@ -1,0 +1,10 @@
+{
+    "core": {
+        "AdminNotifications": {
+            "antispambycleantalk": "IPS\\antispambycleantalk\\extensions\\core\\AdminNotifications\\antispambycleantalk"
+        },
+        "Uninstall": {
+            "antispambycleantalk": "IPS\\antispambycleantalk\\extensions\\core\\Uninstall\\antispambycleantalk"
+        }
+    }
+}

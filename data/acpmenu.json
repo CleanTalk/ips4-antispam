@@ -1,0 +1,11 @@
+{
+    "antispambycleantalk": {
+        "settings": {
+            "tab": "community",
+            "controller": "settings",
+            "do": "",
+            "restriction": "",
+            "subcontrollers": ""
+        }
+    }
+}

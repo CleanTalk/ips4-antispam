@@ -1,0 +1,9 @@
+{
+    "admin": {
+        "antispambycleantalk": {
+            "default_controller": "",
+            "protected": false,
+            "default": null
+        }
+    }
+}
