@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<build>
+ <module key="admin/antispambycleantalk"><![CDATA[{"default_controller":"","protected":false,"default":null}]]></module>
+ <setting key="ct_access_key"><![CDATA[{"key":"ct_access_key","default":"0"}]]></setting>
+ <setting key="ct_cleantalk_sfw"><![CDATA[{"key":"ct_cleantalk_sfw","default":"0"}]]></setting>
+ <setting key="ct_cleantalk_show_banner"><![CDATA[{"key":"ct_cleantalk_show_banner","default":"0"}]]></setting>
+ <setting key="ct_contact_form_check"><![CDATA[{"key":"ct_contact_form_check","default":"0"}]]></setting>
+ <setting key="ct_moderate_new"><![CDATA[{"key":"ct_moderate_new","default":"0"}]]></setting>
+ <setting key="ct_posts_to_check"><![CDATA[{"key":"ct_posts_to_check","default":"10"}]]></setting>
+ <setting key="ct_server_changed"><![CDATA[{"key":"ct_server_changed","default":"0"}]]></setting>
+ <setting key="ct_server_ttl"><![CDATA[{"key":"ct_server_ttl","default":"0"}]]></setting>
+ <setting key="ct_server_url"><![CDATA[{"key":"ct_server_url","default":"https:\/\/moderate.cleantalk.org"}]]></setting>
+ <setting key="ct_show_link"><![CDATA[{"key":"ct_show_link","default":"0"}]]></setting>
+ <setting key="ct_spam_check"><![CDATA[{"key":"ct_spam_check","default":"0"}]]></setting>
+ <setting key="ct_work_url"><![CDATA[{"key":"ct_work_url","default":"0"}]]></setting>
+ <hook key="registration"><![CDATA[{"type":"C","class":"\\IPS\\Member"}]]></hook>
+ <hook key="sfw_js"><![CDATA[{"type":"C","class":"\\IPS\\Output"}]]></hook>
+ <hook key="comment"><![CDATA[{"type":"C","class":"\\IPS\\Content\\Comment"}]]></hook>
+ <hook key="admin_actions"><![CDATA[{"type":"S","class":"\\IPS\\Theme\\class_core_admin_global"}]]></hook>
+ <hook key="mcheck"><![CDATA[{"type":"C","class":"\\IPS\\core\\modules\\admin\\members\\members"}]]></hook>
+ <hook key="contact"><![CDATA[{"type":"C","class":"\\IPS\\core\\modules\\front\\contact\\contact"}]]></hook>
+</build>

@@ -1,0 +1,50 @@
+[
+    {
+        "key": "ct_access_key",
+        "default": "0"
+    },
+    {
+        "key": "ct_cleantalk_sfw",
+        "default": "0"
+    },
+    {
+        "key": "ct_cleantalk_show_banner",
+        "default": "0"
+    },
+    {
+        "key": "ct_contact_form_check",
+        "default": "0"
+    },
+    {
+        "key": "ct_moderate_new",
+        "default": "0"
+    },
+    {
+        "key": "ct_posts_to_check",
+        "default": "10"
+    },
+    {
+        "key": "ct_server_changed",
+        "default": "0"
+    },
+    {
+        "key": "ct_server_ttl",
+        "default": "0"
+    },
+    {
+        "key": "ct_server_url",
+        "default": "https:\/\/moderate.cleantalk.org"
+    },
+    {
+        "key": "ct_show_link",
+        "default": "0"
+    },
+    {
+        "key": "ct_spam_check",
+        "default": "0"
+    },
+    {
+        "key": "ct_work_url",
+        "default": "0"
+    }
+]

@@ -13,9 +13,11 @@ class CleanTalkSFW
 	public $blocked_ip = '';
 	public $result = false;
 	
+	public $debug_data = '';
+	
 	public function cleantalk_get_real_ip()
 	{
-		if ( function_exists( 'apache_request_headers' ) )
+		if ( \function_exists( 'apache_request_headers' ) )
 		{
 			$headers = apache_request_headers();
 		}
@@ -55,7 +57,7 @@ class CleanTalkSFW
 		
 		for($i=0;$i<sizeof($this->ip_array);$i++)
 		{
-			$result = IPS\Db::i()->select('count(network)', 'ct_cleantalk_sfw', "network = ".$this->ip_array[$i]." & mask", "", 1);
+			$result = IPS\Db::i()->select('count(network)', 'antispambycleantalk_sfw', "network = ".$this->ip_array[$i]." & mask", "", 1);
 			$cnt = $result->first();
 
 			if($cnt>0)
@@ -70,13 +72,13 @@ class CleanTalkSFW
 		}
 		if($passed_ip!='')
 		{
-			$domain = isset( $_SERVER['HTTP_HOST'] )
+			$domain = ( isset( $_SERVER['HTTP_HOST'] )
 				? $_SERVER['HTTP_HOST']
-				: isset( $_SERVER['SERVER_NAME'] )
+				: isset( $_SERVER['SERVER_NAME'] ) )
 					? $_SERVER['SERVER_NAME']
 					: null;
 			$key=\IPS\Settings::i()->ct_access_key;
-			@setcookie( 'ct_sfw_pass_key', md5( $passed_ip . $key ), 0, '/', '.' . $domain );
+			@setcookie( 'ct_sfw_pass_key', md5( $passed_ip . $key ), 0, '/', $domain );
 		}
 	}
 	
@@ -87,6 +89,27 @@ class CleanTalkSFW
 		$sfw_die_page=str_replace("{REMOTE_ADDRESS}",$this->blocked_ip,$sfw_die_page);
 		$sfw_die_page=str_replace("{REQUEST_URI}",$_SERVER['REQUEST_URI'],$sfw_die_page);
 		$sfw_die_page=str_replace("{SFW_COOKIE}",md5($this->blocked_ip.$key),$sfw_die_page);
+		if(strpos( $_SERVER['REQUEST_URI'], 'debug') !== false ){
+			$debug = '<h1>IP and Networks</h1>'
+			         . var_export($this->ip_str_array, true)
+			         .'<h1>Blocked IPs</h1>'
+			         . var_export($this->blocked_ip, true)
+			         .'<h1>Passed IPs</h1>'
+			         . var_export($this->passed_ip, true)
+			         . '<h1>Headers</h1>'
+			         . var_export(apache_request_headers(), true)
+			         . '<h1>REMOTE_ADDR</h1>'
+			         . var_export(isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : 'NO', true)
+			         . '<h1>SERVER_ADDR</h1>'
+			         . var_export(isset($_SERVER['SERVER_ADDR']) ? $_SERVER['SERVER_ADDR'] : 'NO', true)
+			         . '<h1>IP_ARRAY</h1>'
+			         . var_export($this->ip_array, true)
+			         . '<h1>ADDITIONAL</h1>'
+			         . var_export($this->debug_data, true);
+		}else
+			$debug = '';
+		$sfw_die_page = str_replace( "{DEBUG}", $debug, $sfw_die_page );
+		
 		@header('HTTP/1.0 403 Forbidden');
 		print $sfw_die_page;
 		die();

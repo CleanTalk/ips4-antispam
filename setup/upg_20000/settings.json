@@ -1,0 +1,18 @@
+{
+    "added": [
+        "ct_access_key",
+        "ct_cleantalk_sfw",
+        "ct_cleantalk_show_banner",
+        "ct_contact_form_check",
+        "ct_moderate_new",
+        "ct_posts_to_check",
+        "ct_server_changed",
+        "ct_server_ttl",
+        "ct_server_url",
+        "ct_show_link",
+        "ct_spam_check",
+        "ct_work_url"
+    ],
+    "edited": [],
+    "removed": []
+}
