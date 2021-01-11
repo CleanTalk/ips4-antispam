@@ -107,7 +107,8 @@ class antispambycleantalk_hook_registration extends _HOOK_CLASS_
             {
 
                 try{
-                    if (\IPS\Member::loggedIn()->isAdmin())
+                    $member = \IPS\Member::loggedIn();
+                    if ($member === NULL || (isset($member) && $member->isAdmin()))
                         return \call_user_func_array( 'parent::save', \func_get_args() );
                     $new		= $this->_new;
                     $ct_access_key=\IPS\Settings::i()->ct_access_key;
