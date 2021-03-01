@@ -22,7 +22,7 @@ class _Application extends \IPS\Application
         $coreApp = \IPS\Application::load('core');
         if( \version_compare( $coreApp->version, '4.4.0') >= 0 ) {
             if( ! \IPS\Settings::i()->ct_access_key ) {
-                \IPS\core\AdminNotification::send( 'antispambycleantalk', 'antispambycleantalk', 'keyIsEmpty', true );
+                \IPS\core\AdminNotification::send( 'antispambycleantalk', 'notification', 'keyIsEmpty', true );
             }
         }
 

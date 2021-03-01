@@ -167,7 +167,7 @@ class antispambycleantalk_hook_contact extends _HOOK_CLASS_
                             $ct_request->sender_email 		= ($member->member_id ? $member->email : $values['email_address']);
                             $ct_request->sender_info 		= $sender_info;
                             $ct_request->post_info          = $post_info;
-                            $ct_request->agent 				= 'ipboard4-198';
+                            $ct_request->agent 				= 'ipboard4-201';
                             $ct_request->js_on 				= \in_array($_COOKIE['ct_checkjs'], $js_keys) ? 1 : 0;
                             $ct_request->submit_time 		= isset($_COOKIE['ct_ps_timestamp']) ? time() - \intval($_COOKIE['ct_ps_timestamp']) : 0;
                             $ct_request->message 			= trim(strip_tags($values['contact_text']));

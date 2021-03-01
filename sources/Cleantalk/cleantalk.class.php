@@ -1115,14 +1115,17 @@ if(! \function_exists('getAutoKey'))
  * @return type
  */
 
-function noticePaidTill($api_key)
+if (! \function_exists('noticePaidTill'))
 {
-	$request=Array();
-	$request['method_name'] = 'notice_paid_till'; 
-	$request['auth_key'] = $api_key;
-	$url='https://api.cleantalk.org';
-	$result=sendRawRequest($url,$request);
-	return $result;
+    function noticePaidTill($api_key)
+    {
+        $request=Array();
+        $request['method_name'] = 'notice_paid_till'; 
+        $request['auth_key'] = $api_key;
+        $url='https://api.cleantalk.org';
+        $result=sendRawRequest($url,$request);
+        return $result;
+    }
 }
 
 /**

@@ -20,7 +20,7 @@ if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 /**
  * ACP  Notification Extension
  */
-class _antispambycleantalk extends \IPS\core\AdminNotification
+class _notification extends \IPS\core\AdminNotification
 {	
 	/**
 	 * @brief	Identifier for what to group this notification type with on the settings form
@@ -44,7 +44,7 @@ class _antispambycleantalk extends \IPS\core\AdminNotification
 	 */
 	public static function settingsTitle()
 	{
-		return 'acp_notification_antispambycleantalk';
+		return 'Antispam by Cleantalk';
 	}
 	
 	/**
