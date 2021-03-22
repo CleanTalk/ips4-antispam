@@ -5,6 +5,13 @@ if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 {
 	exit;
 }
+require_once(\IPS\Application::getRootPath().'/applications/antispambycleantalk/sources/autoload.php');
+
+use Cleantalk\ApbctIPS\RemoteCalls as RemoteCalls;
+use Cleantalk\Common\Firewall\Firewall;
+use Cleantalk\ApbctIPS\DB;
+use Cleantalk\Common\Variables\Server;
+use Cleantalk\Common\Firewall\Modules\SFW;
 
 class antispambycleantalk_hook_sfw_js extends _HOOK_CLASS_
 {
@@ -15,49 +22,34 @@ class antispambycleantalk_hook_sfw_js extends _HOOK_CLASS_
             {
 
                 try{
-
-                    if ( method_exists( '\IPS\Application', "getRootPath" ) ) {
-                        $sfw_file_path = \IPS\Application::getRootPath()."/applications/antispambycleantalk/sources/Cleantalk/cleantalk-sfw.class.php";
-                    } else {
-                        // old IPS support
-                        $sfw_file_path = \IPS\ROOT_PATH."/applications/antispambycleantalk/sources/Cleantalk/cleantalk-sfw.class.php";
-                    }
-
+                    $this->apbct_run_cron();
                     if(
                         \IPS\Settings::i()->ct_cleantalk_sfw == 1 &&
-                        file_exists( $sfw_file_path ) &&
-                        \IPS\Db::i()->checkForTable('antispambycleantalk_sfw')
+                        \IPS\Db::i()->checkForTable('cleantalk_sfw')
                     )
                     {
 
-                        $is_sfw_check=true;
-                        $ip=$this->CleantalkGetIP();
-                        $ip=array_unique($ip);
-                        $key=\IPS\Settings::i()->ct_access_key;
-                        for($i=0;$i<sizeof($ip);$i++){
+                        $firewall = new Firewall(
+                            \IPS\Settings::i()->ct_access_key,
+                            DB::getInstance(),
+                            APBCT_TBL_FIREWALL_LOG
+                        );
+                        $firewall->loadFwModule( new SFW(
+                            APBCT_TBL_FIREWALL_DATA,
+                            array(
+                                'sfw_counter'   => 0,
+                                'cookie_domain' => Server::get('HTTP_HOST'),
+                                'set_cookies'    => 1,
+                            )
+                        ) );
 
-                            if(isset($_COOKIE['ct_sfw_pass_key']) && $_COOKIE['ct_sfw_pass_key']==md5($ip[$i].$key)){
-
-                                $is_sfw_check=false;
-
-                                if(isset($_COOKIE['ct_sfw_passed']))
-                                    @setcookie ('ct_sfw_passed', '0', 1, "/");
-                            }
-                        }
-                        if($is_sfw_check){
-
-                            require_once( $sfw_file_path );
-                            $sfw = new \CleanTalkSFW();
-                            $sfw->cleantalk_get_real_ip();
-                            $sfw->check_ip();
-                            if($sfw->result) {
-                                $sfw->sfw_die();
-                            }
-
-                        }
+                        $firewall->run();
                     }
-
-
+                    // Remote calls
+                    if( RemoteCalls::check() ) {
+                        $rc = new RemoteCalls( \IPS\Settings::i()->ct_access_key );
+                        $rc->perform();
+                    }
                     $ct_show_link=\IPS\Settings::i()->ct_show_link;
                     $html = '
 									<script type="text/javascript">
@@ -183,6 +175,27 @@ class antispambycleantalk_hook_sfw_js extends _HOOK_CLASS_
             }
         }
     }
+    private function apbct_run_cron()
+    {
+        $cron = new Cron();
+        $cron_name = $cron->getCronOptionName();
+        if (!\IPS\Settings::i()->cron_name) {
+            $cron->addTask( 'sfw_update', 'apbct_sfw_update', 86400, time() + 60 );
+            $cron->addTask( 'sfw_send_logs', 'apbct_sfw_send_logs', 3600 );
+        }
+        $tasks_to_run = $cron->checkTasks(); // Check for current tasks. Drop tasks inner counters.
+        if(
+            ! empty( $tasks_to_run ) && // There is tasks to run
+            ! RemoteCalls::check() && // Do not doing CRON in remote call action
+            (
+                ! defined( 'DOING_CRON' ) ||
+                ( defined( 'DOING_CRON' ) && DOING_CRON !== true )
+            )
+        ){
+            $cron_res = $cron->runTasks( $tasks_to_run );
+            // Handle the $cron_res for errors here.
+        }
+    }
     public function setCookie()
     {
         try
@@ -204,59 +217,6 @@ class antispambycleantalk_hook_sfw_js extends _HOOK_CLASS_
                 // Cookies test
                 $cookie_test_value['check_value'] = md5($cookie_test_value['check_value']);
                 setcookie('ct_cookies_test', json_encode($cookie_test_value), 0, '/');
-            }
-            catch ( \RuntimeException $e )
-            {
-                if ( method_exists( get_parent_class(), __FUNCTION__ ) )
-                {
-                    return \call_user_func_array( 'parent::' . __FUNCTION__, \func_get_args() );
-                }
-                else
-                {
-                    throw $e;
-                }
-            }
-        }
-        catch ( \RuntimeException $e )
-        {
-            if ( method_exists( get_parent_class(), __FUNCTION__ ) )
-            {
-                return \call_user_func_array( 'parent::' . __FUNCTION__, \func_get_args() );
-            }
-            else
-            {
-                throw $e;
-            }
-        }
-    }
-    public function CleantalkGetIP(){
-        try
-        {
-            try
-            {
-                $result=Array();
-
-                if ( \function_exists( 'apache_request_headers' ) )
-                    $headers = apache_request_headers();
-                else
-                    $headers = $_SERVER;
-
-                if ( array_key_exists( 'X-Forwarded-For', $headers ) ){
-                    $the_ip=explode(",", trim($headers['X-Forwarded-For']));
-                    $result[] = trim($the_ip[0]);
-                }
-
-                if ( array_key_exists( 'HTTP_X_FORWARDED_FOR', $headers )){
-                    $the_ip=explode(",", trim($headers['HTTP_X_FORWARDED_FOR']));
-                    $result[] = trim($the_ip[0]);
-                }
-
-                $result[] = filter_var( $_SERVER['REMOTE_ADDR'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4 );
-
-                if(isset($_GET['sfw_test_ip']))
-                    $result[]=$_GET['sfw_test_ip'];
-
-                return $result;
             }
             catch ( \RuntimeException $e )
             {

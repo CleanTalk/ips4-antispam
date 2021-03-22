@@ -3,14 +3,21 @@
 
 namespace IPS\antispambycleantalk\modules\admin\antispambycleantalk;
 
+require_once(\IPS\Application::getRootPath().'/applications/antispambycleantalk/sources/autoload.php');
+
+
+use Cleantalk\Antispam\Cleantalk as Cleantalk;
+use Cleantalk\Antispam\CleantalkRequest as CleantalkRequest;
+use Cleantalk\Antispam\CleantalkResponse as CleantalkResponse;
+
 /* To prevent PHP errors (extending class does not exist) revealing path */
 
 use Exception;
 
 if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 {
-	header( ( isset( $_SERVER['SERVER_PROTOCOL'] ) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0' ) . ' 403 Forbidden' );
-	exit;
+    header( ( isset( $_SERVER['SERVER_PROTOCOL'] ) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.0' ) . ' 403 Forbidden' );
+    exit;
 }
 
 /**
@@ -18,25 +25,25 @@ if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
  */
 class _settings extends \IPS\Dispatcher\Controller
 {
-	/**
-	 * Execute
-	 *
-	 * @return	void
-	 */
-	public function execute()
-	{
-		\IPS\Dispatcher::i()->checkAcpPermission( 'settings_manage' );
-		parent::execute();
-	}
+    /**
+     * Execute
+     *
+     * @return  void
+     */
+    public function execute()
+    {
+        \IPS\Dispatcher::i()->checkAcpPermission( 'settings_manage' );
+        parent::execute();
+    }
 
-	/**
-	 * ...
-	 *
-	 * @return	void
-	 */
-	protected function manage()
-	{
-		// This is the default method if no 'do' parameter is specified
+    /**
+     * ...
+     *
+     * @return  void
+     */
+    protected function manage()
+    {
+        // This is the default method if no 'do' parameter is specified
         # Build Form
         $form = new \IPS\Helpers\Form;
         $form->add( new \IPS\Helpers\Form\YesNo( 'ct_moderate_new', \IPS\Settings::i()->ct_moderate_new, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'ct_moderate_new' ) ) );
@@ -51,25 +58,18 @@ class _settings extends \IPS\Dispatcher\Controller
         if ( $values = $form->values( TRUE ) )
         {
 
-            if ( method_exists( '\IPS\Application', "getRootPath" ) ) {
-                require_once(\IPS\Application::getRootPath()."/applications/antispambycleantalk/sources/Cleantalk/cleantalk.class.php");
-            } else {
-                // old IPS support
-                require_once(\IPS\ROOT_PATH."/applications/antispambycleantalk/sources/Cleantalk/cleantalk.class.php");
-            }
-
             $values = $form->values();
 
-            $ct = new \Cleantalk();
+            $ct = new Cleantalk();
             $ct->server_url = \IPS\Settings::i()->ct_server_url;
             $ct->work_url = \IPS\Settings::i()->ct_work_url;
             $ct->server_ttl = \IPS\Settings::i()->ct_server_ttl;
             $ct->server_changed = \IPS\Settings::i()->ct_server_changed;
 
 
-            $ct_request = new \CleantalkRequest();
+            $ct_request = new CleantalkRequest();
             $ct_request->auth_key = $values['ct_access_key'];
-            $ct_request->feedback = '0:ipboard4-201';
+            $ct_request->feedback = '0:ipboard4-21';
             $ct->sendFeedback($ct_request);
             if ($ct->server_change)
             {
@@ -79,41 +79,7 @@ class _settings extends \IPS\Dispatcher\Controller
             }
 
             if( $values['ct_cleantalk_sfw'] == 1 ){
-
-                if ( \IPS\Db::i()->checkForTable('antispambycleantalk_sfw') ) {
-                    $sfw_data_ok = TRUE;
-                    try {
-                        \IPS\Db::i()->delete('antispambycleantalk_sfw');
-                    } catch (Exception $e) {
-                        $sfw_data_ok = FALSE;
-                    }
-                    if ($sfw_data_ok){
-                        $data = Array(	'auth_key' => $values['ct_access_key'],
-                            'method_name' => '2s_blacklists_db'
-                        );
-
-                        $result=sendRawRequest('https://api.cleantalk.org/2.1',$data,false);
-                        $result=json_decode($result, true);
-
-                        if(isset($result['data'])){
-
-                            $swf_data_array = array();
-
-                            for( $i=0; $i < sizeof( $result['data'] ); $i++ ){
-                                array_push($swf_data_array, array('network' => $result['data'][$i][0], 'mask' => $result['data'][$i][1]));
-                            }
-                            try{
-                                \IPS\Db::i()->insert('antispambycleantalk_sfw', $swf_data_array);
-                            } catch (Exception $e) {
-                                $values['ct_cleantalk_sfw'] = FALSE;
-                            }
-                        }
-                    } else {
-                        $values['ct_cleantalk_sfw'] = FALSE;
-                    }
-                } else {
-                    $values['ct_cleantalk_sfw'] = FALSE;
-                }
+                \IPS\antispambycleantalk\_Application::apbct_sfw_update( $values['ct_access_key']);
             }
 
             $form->saveAsSettings( $values );
@@ -137,6 +103,6 @@ class _settings extends \IPS\Dispatcher\Controller
         \IPS\Output::i()->output .= $form;
 
     }
-	
-	// Create new methods with the same name as the 'do' parameter which should execute it
+    
+    // Create new methods with the same name as the 'do' parameter which should execute it
 }

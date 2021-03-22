@@ -3,8 +3,16 @@
 /* To prevent PHP errors (extending class does not exist) revealing path */
 if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 {
-	exit;
+    exit;
 }
+
+require_once(\IPS\Application::getRootPath().'/applications/antispambycleantalk/sources/autoload.php');
+
+
+use Cleantalk\Antispam\Cleantalk as Cleantalk;
+use Cleantalk\Antispam\CleantalkRequest as CleantalkRequest;
+use Cleantalk\Antispam\CleantalkResponse as CleantalkResponse;
+use Cleantalk\Common\Helper as CleantalkHelper;
 
 class antispambycleantalk_hook_registration extends _HOOK_CLASS_
 {
@@ -97,8 +105,8 @@ class antispambycleantalk_hook_registration extends _HOOK_CLASS_
     /**
      * [ActiveRecord] Save Changed Columns
      *
-     * @return	void
-     * @note	We have to be careful when upgrading in case we are coming from an older version
+     * @return  void
+     * @note    We have to be careful when upgrading in case we are coming from an older version
      */
     public function save(){
         try
@@ -110,16 +118,10 @@ class antispambycleantalk_hook_registration extends _HOOK_CLASS_
                     $member = \IPS\Member::loggedIn();
                     if ($member === NULL || (isset($member) && $member->isAdmin()))
                         return \call_user_func_array( 'parent::save', \func_get_args() );
-                    $new		= $this->_new;
+                    $new        = $this->_new;
                     $ct_access_key=\IPS\Settings::i()->ct_access_key;
-                    if( $new ) {
 
-                        if ( method_exists( '\IPS\Application', "getRootPath" ) ) {
-                            require_once(\IPS\Application::getRootPath()."/applications/antispambycleantalk/sources/Cleantalk/cleantalk.class.php");
-                        } else {
-                            // old IPS support
-                            require_once(\IPS\ROOT_PATH."/applications/antispambycleantalk/sources/Cleantalk/cleantalk.class.php");
-                        }
+                    if( $new ) {
 
                         $sender_info = ''; $post_info = '';
                         $lang=\IPS\Lang::getEnabledLanguages();
@@ -128,61 +130,63 @@ class antispambycleantalk_hook_registration extends _HOOK_CLASS_
                         // Pointer data
                         $pointer_data = (isset($_COOKIE['ct_pointer_data']) ? json_decode ($_COOKIE['ct_pointer_data']) : 0);
                         // Timezone from JS
-                        $js_timezone = 	(isset($_COOKIE['ct_timezone']) ? $_COOKIE['ct_timezone'] : 0);
+                        $js_timezone =  (isset($_COOKIE['ct_timezone']) ? $_COOKIE['ct_timezone'] : 0);
                         //First key down timestamp
                         $first_key_press_timestamp = isset($_COOKIE['ct_fkp_timestamp']) ? $_COOKIE['ct_fkp_timestamp'] : 0;
                         // Page opened timestamp
                         $page_set_timestamp = (isset($_COOKIE['ct_ps_timestamp']) ? $_COOKIE['ct_ps_timestamp'] : 0);
 
-                        if( \function_exists('json_encode')){
-                            $arr = array(
-                                'cms_lang' => $locale,
-                                'REFFERRER' => $_SERVER['HTTP_REFERER'],
-                                'USER_AGENT' => $_SERVER['HTTP_USER_AGENT'],
-                                'mouse_cursor_positions' => $pointer_data,
-                                'js_timezone' => $js_timezone,
-                                'key_press_timestamp' => $first_key_press_timestamp,
-                                'page_set_timestamp' => $page_set_timestamp,
-                                'REFFERRER_PREVIOUS' => isset($_COOKIE['ct_prev_referer'])?$_COOKIE['ct_prev_referer']:null,
-                                'cookies_enabled' => self::ctCookiesTest(),
-                            );
-                            $sender_info = json_encode($arr);
+                        $arr = array(
+                            'cms_lang' => $locale,
+                            'REFFERRER' => $_SERVER['HTTP_REFERER'],
+                            'USER_AGENT' => $_SERVER['HTTP_USER_AGENT'],
+                            'mouse_cursor_positions' => $pointer_data,
+                            'js_timezone' => $js_timezone,
+                            'key_press_timestamp' => $first_key_press_timestamp,
+                            'page_set_timestamp' => $page_set_timestamp,
+                            'REFFERRER_PREVIOUS' => isset($_COOKIE['ct_prev_referer'])?$_COOKIE['ct_prev_referer']:null,
+                            'cookies_enabled' => self::ctCookiesTest(),
+                        );
+                        $sender_info = json_encode($arr);
 
-                            $arr = array(
-                                'comment_type' => 'register',
-                            );
+                        $arr = array(
+                            'comment_type' => 'register',
+                        );
 
-                            $post_info = json_encode($arr);
-                        }
+                        $post_info = json_encode($arr);
+
                         if($sender_info === FALSE)
                             $sender_info = '';
                         if($post_info === FALSE)
                             $post_info = '';
 
                         $config_key = $ct_access_key;
-
-                        $ct = new \Cleantalk();
+                        $ct = new Cleantalk();
                         $ct->server_url = \IPS\Settings::i()->ct_server_url;
                         $ct->work_url = \IPS\Settings::i()->ct_work_url;
                         $ct->server_ttl = \IPS\Settings::i()->ct_server_ttl;
                         $ct->server_changed = \IPS\Settings::i()->ct_server_changed;
 
-
                         $sender_email = filter_var($_POST['email_address'], FILTER_SANITIZE_EMAIL);
-                        $sender_ip = $ct->cleantalk_get_real_ip();
 
-                        $ct_request = new \CleantalkRequest();
+                        $ct_request = new CleantalkRequest();
                         $ct_request->auth_key = $config_key;
                         $ct_request->sender_nickname = $_POST['username'];
-                        $ct_request->sender_ip = $sender_ip;
+
+                        $ct_request->sender_ip       = CleantalkHelper::ip__get(array('real'), false);
+                        $ct_request->x_forwarded_for = CleantalkHelper::ip__get(array('x_forwarded_for'), false);
+                        $ct_request->x_real_ip       = CleantalkHelper::ip__get(array('x_real_ip'), false);
+
                         $ct_request->sender_email = $sender_email;
                         $ct_request->sender_info = $sender_info;
                         $ct_request->post_info = $post_info;
-                        $ct_request->agent = 'ipboard4-201';
+                        $ct_request->agent = 'ipboard4-21';
+
                         //$ct_request->js_on = $_COOKIE['ct_checkjs'] == md5(\IPS\Settings::i()->ct_access_key . '+' . \IPS\Settings::i()->email_in) ? 1 : 0;
                         $ct_request->js_on = \in_array($_COOKIE['ct_checkjs'], self::getCheckJSArray()) ? 1 : 0;
                         $ct_request->submit_time = isset($_COOKIE['ct_ps_timestamp']) ? time() - \intval($_COOKIE['ct_ps_timestamp']) : 0;
                         $ct_result = $ct->isAllowUser($ct_request);
+
                         if ($ct->server_change)
                         {
                             \IPS\Settings::i()->ct_work_url = $ct->work_url;

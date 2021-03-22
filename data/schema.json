@@ -1,11 +1,11 @@
 {
-    "antispambycleantalk_sfw": {
-        "name": "antispambycleantalk_sfw",
+    "cleantalk_sfw": {
+        "name": "cleantalk_sfw",
         "columns": {
             "id": {
                 "name": "id",
                 "type": "INT",
-                "length": "20",
+                "length": "11",
                 "decimals": null,
                 "values": null,
                 "allow_null": false,
@@ -77,8 +77,8 @@
         },
         "comment": ""
     },
-    "antispambycleantalk_sfw_logs": {
-        "name": "antispambycleantalk_sfw_logs",
+    "cleantalk_sfw_logs": {
+        "name": "cleantalk_sfw_logs",
         "columns": {
             "id": {
                 "name": "id",
