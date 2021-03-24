@@ -3,11 +3,12 @@
 /* To prevent PHP errors (extending class does not exist) revealing path */
 if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 {
-	exit;
+    exit;
 }
 require_once(\IPS\Application::getRootPath().'/applications/antispambycleantalk/sources/autoload.php');
 
-use Cleantalk\ApbctIPS\RemoteCalls as RemoteCalls;
+use Cleantalk\ApbctIPS\RemoteCalls;
+use Cleantalk\ApbctIPS\Cron;
 use Cleantalk\Common\Firewall\Firewall;
 use Cleantalk\ApbctIPS\DB;
 use Cleantalk\Common\Variables\Server;
@@ -24,16 +25,15 @@ class antispambycleantalk_hook_sfw_js extends _HOOK_CLASS_
                 try{
                     $this->apbct_run_cron();
                     if(
-                        \IPS\Settings::i()->ct_cleantalk_sfw == 1 &&
-                        \IPS\Db::i()->checkForTable('cleantalk_sfw')
+                        \IPS\Settings::i()->ct_cleantalk_sfw == 1 
                     )
                     {
-
                         $firewall = new Firewall(
                             \IPS\Settings::i()->ct_access_key,
                             DB::getInstance(),
                             APBCT_TBL_FIREWALL_LOG
                         );
+
                         $firewall->loadFwModule( new SFW(
                             APBCT_TBL_FIREWALL_DATA,
                             array(
@@ -44,6 +44,7 @@ class antispambycleantalk_hook_sfw_js extends _HOOK_CLASS_
                         ) );
 
                         $firewall->run();
+
                     }
                     // Remote calls
                     if( RemoteCalls::check() ) {
@@ -52,89 +53,89 @@ class antispambycleantalk_hook_sfw_js extends _HOOK_CLASS_
                     }
                     $ct_show_link=\IPS\Settings::i()->ct_show_link;
                     $html = '
-									<script type="text/javascript">
-										function ctSetCookie(c_name, value) {
-											document.cookie = c_name + "=" + encodeURIComponent(value) + "; path=/";
-										}
-		
-										ctSetCookie("ct_ps_timestamp", Math.floor(new Date().getTime()/1000));
-										ctSetCookie("ct_fkp_timestamp", "0");
-										ctSetCookie("ct_pointer_data", "0");
-										ctSetCookie("ct_timezone", "0");
-		
-										setTimeout(function(){
-											ctSetCookie("ct_checkjs", "%s");
-											ctSetCookie("ct_timezone", d.getTimezoneOffset()/60*(-1));
-										},1000);
-		
-								//Stop observing function
-										function ctMouseStopData(){
-											if(typeof window.addEventListener == "function")
-												window.removeEventListener("mousemove", ctFunctionMouseMove);
-											else
-												window.detachEvent("onmousemove", ctFunctionMouseMove);
-											clearInterval(ctMouseReadInterval);
-											clearInterval(ctMouseWriteDataInterval);				
-										}
-		
-								//Stop key listening function
-										function ctKeyStopStopListening(){
-											if(typeof window.addEventListener == "function"){
-												window.removeEventListener("mousedown", ctFunctionFirstKey);
-												window.removeEventListener("keydown", ctFunctionFirstKey);
-											}else{
-												window.detachEvent("mousedown", ctFunctionFirstKey);
-												window.detachEvent("keydown", ctFunctionFirstKey);
-											}
-											clearInterval(ctMouseReadInterval);
-											clearInterval(ctMouseWriteDataInterval);				
-										}
-		
-										var d = new Date(), 
-											ctTimeMs = new Date().getTime(),
-											ctMouseEventTimerFlag = true, //Reading interval flag
-											ctMouseData = "[",
-											ctMouseDataCounter = 0;
-											
-								//Reading interval
-										var ctMouseReadInterval = setInterval(function(){
-												ctMouseEventTimerFlag = true;
-											}, 300);
-											
-								//Writting interval
-										var ctMouseWriteDataInterval = setInterval(function(){ 
-												var ctMouseDataToSend = ctMouseData.slice(0,-1).concat("]");
-												ctSetCookie("ct_pointer_data", ctMouseDataToSend);
-											}, 1200);
-		
-								//Logging mouse position each 300 ms
-										var ctFunctionMouseMove = function output(event){
-											if(ctMouseEventTimerFlag == true){
-												var mouseDate = new Date();
-												ctMouseData += "[" + event.pageY + "," + event.pageX + "," + (mouseDate.getTime() - ctTimeMs) + "],";
-												ctMouseDataCounter++;
-												ctMouseEventTimerFlag = false;
-												if(ctMouseDataCounter >= 100)
-													ctMouseStopData();
-											}
-										}
-								//Writing first key press timestamp
-										var ctFunctionFirstKey = function output(event){
-											var KeyTimestamp = Math.floor(new Date().getTime()/1000);
-											ctSetCookie("ct_fkp_timestamp", KeyTimestamp);
-											ctKeyStopStopListening();
-										}
-		
-										if(typeof window.addEventListener == "function"){
-											window.addEventListener("mousemove", ctFunctionMouseMove);
-											window.addEventListener("mousedown", ctFunctionFirstKey);
-											window.addEventListener("keydown", ctFunctionFirstKey);
-										}else{
-											window.attachEvent("onmousemove", ctFunctionMouseMove);
-											window.attachEvent("mousedown", ctFunctionFirstKey);
-											window.attachEvent("keydown", ctFunctionFirstKey);
-										}
-									</script>';
+                                    <script type="text/javascript">
+                                        function ctSetCookie(c_name, value) {
+                                            document.cookie = c_name + "=" + encodeURIComponent(value) + "; path=/";
+                                        }
+        
+                                        ctSetCookie("ct_ps_timestamp", Math.floor(new Date().getTime()/1000));
+                                        ctSetCookie("ct_fkp_timestamp", "0");
+                                        ctSetCookie("ct_pointer_data", "0");
+                                        ctSetCookie("ct_timezone", "0");
+        
+                                        setTimeout(function(){
+                                            ctSetCookie("ct_checkjs", "%s");
+                                            ctSetCookie("ct_timezone", d.getTimezoneOffset()/60*(-1));
+                                        },1000);
+        
+                                //Stop observing function
+                                        function ctMouseStopData(){
+                                            if(typeof window.addEventListener == "function")
+                                                window.removeEventListener("mousemove", ctFunctionMouseMove);
+                                            else
+                                                window.detachEvent("onmousemove", ctFunctionMouseMove);
+                                            clearInterval(ctMouseReadInterval);
+                                            clearInterval(ctMouseWriteDataInterval);                
+                                        }
+        
+                                //Stop key listening function
+                                        function ctKeyStopStopListening(){
+                                            if(typeof window.addEventListener == "function"){
+                                                window.removeEventListener("mousedown", ctFunctionFirstKey);
+                                                window.removeEventListener("keydown", ctFunctionFirstKey);
+                                            }else{
+                                                window.detachEvent("mousedown", ctFunctionFirstKey);
+                                                window.detachEvent("keydown", ctFunctionFirstKey);
+                                            }
+                                            clearInterval(ctMouseReadInterval);
+                                            clearInterval(ctMouseWriteDataInterval);                
+                                        }
+        
+                                        var d = new Date(), 
+                                            ctTimeMs = new Date().getTime(),
+                                            ctMouseEventTimerFlag = true, //Reading interval flag
+                                            ctMouseData = "[",
+                                            ctMouseDataCounter = 0;
+                                            
+                                //Reading interval
+                                        var ctMouseReadInterval = setInterval(function(){
+                                                ctMouseEventTimerFlag = true;
+                                            }, 300);
+                                            
+                                //Writting interval
+                                        var ctMouseWriteDataInterval = setInterval(function(){ 
+                                                var ctMouseDataToSend = ctMouseData.slice(0,-1).concat("]");
+                                                ctSetCookie("ct_pointer_data", ctMouseDataToSend);
+                                            }, 1200);
+        
+                                //Logging mouse position each 300 ms
+                                        var ctFunctionMouseMove = function output(event){
+                                            if(ctMouseEventTimerFlag == true){
+                                                var mouseDate = new Date();
+                                                ctMouseData += "[" + event.pageY + "," + event.pageX + "," + (mouseDate.getTime() - ctTimeMs) + "],";
+                                                ctMouseDataCounter++;
+                                                ctMouseEventTimerFlag = false;
+                                                if(ctMouseDataCounter >= 100)
+                                                    ctMouseStopData();
+                                            }
+                                        }
+                                //Writing first key press timestamp
+                                        var ctFunctionFirstKey = function output(event){
+                                            var KeyTimestamp = Math.floor(new Date().getTime()/1000);
+                                            ctSetCookie("ct_fkp_timestamp", KeyTimestamp);
+                                            ctKeyStopStopListening();
+                                        }
+        
+                                        if(typeof window.addEventListener == "function"){
+                                            window.addEventListener("mousemove", ctFunctionMouseMove);
+                                            window.addEventListener("mousedown", ctFunctionFirstKey);
+                                            window.addEventListener("keydown", ctFunctionFirstKey);
+                                        }else{
+                                            window.attachEvent("onmousemove", ctFunctionMouseMove);
+                                            window.attachEvent("mousedown", ctFunctionFirstKey);
+                                            window.attachEvent("keydown", ctFunctionFirstKey);
+                                        }
+                                    </script>';
                     $ct_checkjs_key = md5(\IPS\Settings::i()->ct_access_key . '+' . \IPS\Settings::i()->email_in . date("Ymd",time()));
                     $html = sprintf($html, $ct_checkjs_key);
                     if( $ct_show_link == 1 )
