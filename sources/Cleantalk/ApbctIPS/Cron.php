@@ -7,7 +7,7 @@ class Cron extends \Cleantalk\Common\Cron {
     public function saveTasks($tasks)
     {
         $cron_option_name = $this->cron_option_name;
-        \IPS\Settings::i()->cron_option_name = array('last_start' => time(), 'tasks' => $tasks);
+        \IPS\Settings::i()->$cron_option_name = array('last_start' => time(), 'tasks' => $tasks);
     }
 
     /**
@@ -19,7 +19,7 @@ class Cron extends \Cleantalk\Common\Cron {
     {
         // TODO: Implement getTasks() method.
         $cron_option_name = $this->cron_option_name;
-        return isset(\IPS\Settings::i()->cron_option_name->tasks) ? \IPS\Settings::i()->cron_option_name->tasks : null;
+        return isset(\IPS\Settings::i()->$cron_option_name->tasks) ? \IPS\Settings::i()->cron_option_name->tasks : null;
     }
 
     /**
@@ -31,7 +31,7 @@ class Cron extends \Cleantalk\Common\Cron {
     {
         // TODO: Implement getCronLastStart() method.
         $cron_option_name = $this->cron_option_name;
-        return isset(\IPS\Settings::i()->cron_option_name->last_start) ? \IPS\Settings::i()->cron_option_name->last_start : 0;
+        return isset(\IPS\Settings::i()->$cron_option_name->last_start) ? \IPS\Settings::i()->cron_option_name->last_start : 0;
     }
 
     /**
@@ -42,7 +42,7 @@ class Cron extends \Cleantalk\Common\Cron {
     public function setCronLastStart()
     {
         $cron_option_name = $this->cron_option_name;
-        \IPS\Settings::i()->cron_option_name = array('last_start' => time(), 'tasks' => $this->getTasks());
+        \IPS\Settings::i()->$cron_option_name = array('last_start' => time(), 'tasks' => $this->getTasks());
         return true;
     }
 }
