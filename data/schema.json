@@ -160,6 +160,30 @@
                 "comment": "",
                 "unsigned": false,
                 "auto_increment": false
+            },
+            "ua_name": {
+                "name": "ua_name",
+                "type": "VARCHAR",
+                "length": "1024",
+                "decimals": null,
+                "values": null,
+                "allow_null": false,
+                "default": null,
+                "comment": "",
+                "unsigned": false,
+                "auto_increment": false
+            },
+            "ua_id": {
+                "name": "ua_id",
+                "type": "INT",
+                "length": "11",
+                "decimals": null,
+                "values": null,
+                "allow_null": true,
+                "default": null,
+                "comment": "",
+                "unsigned": false,
+                "auto_increment": false
             }
         },
         "indexes": {

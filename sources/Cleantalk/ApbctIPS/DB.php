@@ -57,7 +57,7 @@ class DB extends \Cleantalk\Common\DB {
      * @return array|object|void|null
      */
     public function fetch( $query = false, $response_type = false ) {
-        $this->result = \IPS\DB::i()->query($query);
+        $this->result = \IPS\DB::i()->query($query)->fetch_row()[0];
         
         return $this->result;
     }
@@ -72,8 +72,9 @@ class DB extends \Cleantalk\Common\DB {
      * @return array|object|null
      */
     public function fetch_all( $query = false, $response_type = false ) {
-        $this->result = \IPS\DB::i()->query($query);
-        
+        foreach (\IPS\DB::i()->query($query) as $row) {
+            $this->result[] = $row;
+        }
         return $this->result;
     }
 

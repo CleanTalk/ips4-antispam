@@ -96,27 +96,26 @@ class SFW extends FirewallModule {
 				AND	network = " . $current_ip_v4 . " & mask 
 				AND " . rand( 1, 100000 ) . "  
 				ORDER BY status DESC");
-			
+
 			if( ! empty( $db_results ) ){
 				
 				foreach( $db_results as $db_result ){
-					
+
 					if( $db_result['status'] == 1 ) {
                         $results[] = array('ip' => $current_ip, 'is_personal' => false, 'status' => 'PASS_SFW__BY_WHITELIST',);
                         break;
                     }
 					else
 						$results[] = array('ip' => $current_ip, 'is_personal' => false, 'status' => 'DENY_SFW',);
-					
 				}
-				
+
 			}else{
 				
 				$results[] = array( 'ip' => $current_ip, 'is_personal' => false, 'status' => 'PASS_SFW' );
 				
 			}
 		}
-		
+
 		return $results;
 	}
 	
@@ -149,7 +148,7 @@ class SFW extends FirewallModule {
 			blocked_entries = blocked_entries" . ( strpos( $status, 'DENY' ) !== false ? ' + 1' : '' ) . ",
 			entries_timestamp = '" . intval( $time ) . "',
 			ua_name = '" . Server::get('HTTP_USER_AGENT') . "'";
-		
+
 		$this->db->execute( $query );
 	}
 
@@ -196,11 +195,11 @@ class SFW extends FirewallModule {
 		}
 		
 		// File exists?
-		if( file_exists( __DIR__ . "/lib/Cleantalk/ApbctWP/Firewall/die_page_sfw.html" ) ){
+		if( file_exists( __DIR__ . "/die_page_sfw.html" ) ){
 			
-			$sfw_die_page = file_get_contents( __DIR__ . "/lib/Cleantalk/ApbctWP/Firewall/die_page_sfw.html" );
+			$sfw_die_page = file_get_contents( __DIR__ . "/die_page_sfw.html" );
 
-            $net_count = $this->db->fetch( 'SELECT COUNT(*) as net_count FROM ' . $this->db_data_table_name )['net_count'];
+            $net_count = $this->db->fetch( 'SELECT COUNT(*) as net_count FROM ' . $this->db_data_table_name );
 
             $status = $result['status'] === 'PASS_SFW__BY_WHITELIST' ? '1' : '0';
             $cookie_val = md5( $result['ip'] . $this->api_key ) . $status;
