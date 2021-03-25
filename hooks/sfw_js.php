@@ -180,7 +180,7 @@ class antispambycleantalk_hook_sfw_js extends _HOOK_CLASS_
     {
         $cron = new Cron();
         $cron_name = $cron->getCronOptionName();
-        if (!\IPS\Settings::i()->cron_name) {
+        if (!\IPS\Settings::i()->$cron_name) {
             $cron->addTask( 'sfw_update', 'apbct_sfw_update', 86400, time() + 60 );
             $cron->addTask( 'sfw_send_logs', 'apbct_sfw_send_logs', 3600 );
         }
