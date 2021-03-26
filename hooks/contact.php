@@ -90,7 +90,10 @@ class antispambycleantalk_hook_contact extends _HOOK_CLASS_
                         {
                             $form->add( new \IPS\Helpers\Form\Text( 'contact_name', NULL, TRUE ) );
                             $form->add( new \IPS\Helpers\Form\Email( 'email_address', NULL, TRUE ) );
-                            $form->add( new \IPS\Helpers\Form\Captcha );
+                            if ( \IPS\Settings::i()->bot_antispam_type !== 'none' && \IPS\Settings::i()->guest_captcha )
+                            {
+                                $form->add( new \IPS\Helpers\Form\Captcha );
+                            }
                         }
 
                         $values = $form->values();
