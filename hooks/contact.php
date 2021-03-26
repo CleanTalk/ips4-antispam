@@ -199,54 +199,54 @@ class antispambycleantalk_hook_contact extends _HOOK_CLASS_
                                     else
                                     {
                                         $ct_die_html = '<head>
-                                                                        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-                                                                        <title>Blacklisted</title>
-                                                                        <style type="text/css">
-                                                                            html {
-                                                                                background: #f1f1f1;
-                                                                            }
-                                                                            body {
-                                                                                background: #fff;
-                                                                                color: #444;
-                                                                                font-family: "Open Sans", sans-serif;
-                                                                                margin: 2em auto;
-                                                                                padding: 1em 2em;
-                                                                                max-width: 700px;
-                                                                                -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.13);
-                                                                                box-shadow: 0 1px 3px rgba(0,0,0,0.13);
-                                                                            }
-                                                                            h1 {
-                                                                                border-bottom: 1px solid #dadada;
-                                                                                clear: both;
-                                                                                color: #666;
-                                                                                font: 24px "Open Sans", sans-serif;
-                                                                                margin: 30px 0 0 0;
-                                                                                padding: 0;
-                                                                                padding-bottom: 7px;
-                                                                            }
-                                                                            #error-page {
-                                                                                margin-top: 50px;
-                                                                            }
-                                                                            #error-page p {
-                                                                                font-size: 14px;
-                                                                                line-height: 1.5;
-                                                                                margin: 25px 0 20px;
-                                                                            }
-                                                                            a {
-                                                                                color: #21759B;
-                                                                                text-decoration: none;
-                                                                            }
-                                                                            a:hover {
-                                                                                color: #D54E21;
-                                                                            }
-        
-                                                                                </style>
-                                                                    </head>
-                                                                    <body id="error-page">
-                                                                        <p><center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> Spam protection</center><br><br>
-                                                                    %ERROR_TEXT%
-                                                                    <script>setTimeout("history.back()", 8000);</script></p>
-                                                                    <p><a href="javascript:history.back()"">&laquo; Back</a></p></body>';
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>Blacklisted</title>
+    <style type="text/css">
+        html {
+            background: #f1f1f1;
+        }
+        body {
+            background: #fff;
+            color: #444;
+            font-family: "Open Sans", sans-serif;
+            margin: 2em auto;
+            padding: 1em 2em;
+            max-width: 700px;
+            -webkit-box-shadow: 0 1px 3px rgba(0,0,0,0.13);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.13);
+        }
+        h1 {
+            border-bottom: 1px solid #dadada;
+            clear: both;
+            color: #666;
+            font: 24px "Open Sans", sans-serif;
+            margin: 30px 0 0 0;
+            padding: 0;
+            padding-bottom: 7px;
+        }
+        #error-page {
+            margin-top: 50px;
+        }
+        #error-page p {
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 25px 0 20px;
+        }
+        a {
+            color: #21759B;
+            text-decoration: none;
+        }
+        a:hover {
+            color: #D54E21;
+        }
+
+            </style>
+</head>
+<body id="error-page">
+    <p><center><b style="color: #49C73B;">Clean</b><b style="color: #349ebf;">Talk.</b> Spam protection</center><br><br>
+%ERROR_TEXT%
+<script>setTimeout("history.back()", 5000);</script></p>
+<p><a href=\'javascript:history.back()\'>&laquo; Back</a></p></body>';
                                         \IPS\Output::i()->sendOutput(
                                             str_replace('%ERROR_TEXT%',$ct_result_comment, $ct_die_html),
                                             200,
