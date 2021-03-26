@@ -7,10 +7,9 @@ if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 }
 require_once(\IPS\Application::getRootPath().'/applications/antispambycleantalk/sources/autoload.php');
 
-
-use Cleantalk\Antispam\Cleantalk as Cleantalk;
-use Cleantalk\Antispam\CleantalkRequest as CleantalkRequest;
-use Cleantalk\Antispam\CleantalkResponse as CleantalkResponse;
+use Cleantalk\Antispam\Cleantalk;
+use Cleantalk\Antispam\CleantalkRequest;
+use Cleantalk\Antispam\CleantalkResponse;
 use Cleantalk\Common\Helper as CleantalkHelper;
 
 abstract class antispambycleantalk_hook_comment extends _HOOK_CLASS_
@@ -132,9 +131,8 @@ abstract class antispambycleantalk_hook_comment extends _HOOK_CLASS_
                         $ct->server_changed = \IPS\Settings::i()->ct_server_changed;
 
                         $sender_email = filter_var($member->email, FILTER_SANITIZE_EMAIL);
-                        $sender_ip = $ct->cleantalk_get_real_ip();
 
-                        $ct_request = new \CleantalkRequest();
+                        $ct_request = new CleantalkRequest();
                         $ct_request->auth_key = $config_key;
 
                         if(isset($_POST['guest_name']))
@@ -142,7 +140,9 @@ abstract class antispambycleantalk_hook_comment extends _HOOK_CLASS_
                         else
                             $ct_request->sender_nickname = $member->name;
 
-                        $ct_request->sender_ip = $sender_ip;
+                        $ct_request->sender_ip          = CleantalkHelper::ip__get(array('real'), false);
+                        $ct_request->x_forwarded_for    = CleantalkHelper::ip__get(array('x_forwarded_for'), false);
+                        $ct_request->x_real_ip          = CleantalkHelper::ip__get(array('x_real_ip'), false);
                         $ct_request->sender_email = $sender_email;
                         $ct_request->sender_info = $sender_info;
                         $ct_request->post_info = $post_info;
