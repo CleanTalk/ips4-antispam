@@ -25,7 +25,8 @@ class antispambycleantalk_hook_sfw_js extends _HOOK_CLASS_
                 try{
                     $this->apbct_run_cron();
                     if(
-                        \IPS\Settings::i()->ct_cleantalk_sfw == 1 
+                        \IPS\Settings::i()->ct_cleantalk_sfw == 1 &&
+                        !\IPS\Request::i()->isAjax()
                     )
                     {
                         $firewall = new Firewall(
