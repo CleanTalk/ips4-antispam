@@ -80,6 +80,7 @@ class _settings extends \IPS\Dispatcher\Controller
 
             if( $values['ct_cleantalk_sfw'] == 1 ){
                 \IPS\antispambycleantalk\_Application::apbct_sfw_update( $values['ct_access_key']);
+                \IPS\antispambycleantalk\_Application::apbct_sfw_send_logs( $values['ct_access_key']);
             }
 
             $form->saveAsSettings( $values );

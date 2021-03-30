@@ -26,9 +26,9 @@ class Helper extends \Cleantalk\Common\Helper {
      */
     public static function setFwStats( $fw_stats )
     {
-        \IPS\Settings::i()->firewall_updating_id = $fw_stats['firewall_updating_id'];
-        \IPS\Settings::i()->firewall_updating_last_start = $fw_stats['firewall_updating_last_start'];
-        \IPS\Settings::i()->firewall_update_percent = $fw_stats['firewall_update_percent'];
+        \IPS\Settings::i()->firewall_updating_id = isset($fw_stats['firewall_updating_id']) ? $fw_stats['firewall_updating_id'] : null;
+        \IPS\Settings::i()->firewall_updating_last_start = isset($fw_stats['firewall_updating_last_start']) ? $fw_stats['firewall_updating_last_start'] : 0;
+        \IPS\Settings::i()->firewall_update_percent = isset($fw_stats['firewall_update_percent']) ? $fw_stats['firewall_update_percent'] : 0;
     }
 
     /**
