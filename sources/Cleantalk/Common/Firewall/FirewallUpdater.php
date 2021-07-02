@@ -54,7 +54,7 @@ class FirewallUpdater
     {
         $this->api_key            = $api_key;
         $this->db                 = $db;
-        $this->fw_data_table_name = $db->prefix . $fw_data_table_name;
+        $this->fw_data_table_name = $fw_data_table_name;
         $this->helper             = new Helper();
         $this->api                = new API();
     }
@@ -359,8 +359,8 @@ class FirewallUpdater
             $sql = sprintf( Schema::getSchema('sfw'), $this->db->prefix );
             $this->db->execute( $sql );
         }
-        $this->db->execute( 'CREATE TABLE IF NOT EXISTS `' . $this->db->prefix . APBCT_TBL_FIREWALL_DATA . '_temp` LIKE `' . $this->db->prefix . APBCT_TBL_FIREWALL_DATA . '`;' );
-        $this->db->execute( 'TRUNCATE TABLE `' . $this->db->prefix . APBCT_TBL_FIREWALL_DATA . '_temp`;' );
+        $this->db->execute( 'CREATE TABLE IF NOT EXISTS `' . APBCT_TBL_FIREWALL_DATA . '_temp` LIKE `' . APBCT_TBL_FIREWALL_DATA . '`;' );
+        $this->db->execute( 'TRUNCATE TABLE `' . APBCT_TBL_FIREWALL_DATA . '_temp`;' );
     }
 
     /**
@@ -370,7 +370,7 @@ class FirewallUpdater
      */
     private function deleteMainDataTables()
     {
-        $this->db->execute( 'DROP TABLE `'. $this->db->prefix . APBCT_TBL_FIREWALL_DATA .'`;' );
+        $this->db->execute( 'DROP TABLE `'. APBCT_TBL_FIREWALL_DATA .'`;' );
     }
 
     /**
@@ -380,7 +380,7 @@ class FirewallUpdater
      */
     private function renameDataTables()
     {
-        $this->db->execute( 'ALTER TABLE `'. $this->db->prefix . APBCT_TBL_FIREWALL_DATA .'_temp` RENAME `'. $this->db->prefix . APBCT_TBL_FIREWALL_DATA .'`;' );
+        $this->db->execute( 'ALTER TABLE `'. APBCT_TBL_FIREWALL_DATA .'_temp` RENAME `'. APBCT_TBL_FIREWALL_DATA .'`;' );
     }
 
 }
