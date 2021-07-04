@@ -64,7 +64,7 @@ abstract class antispambycleantalk_hook_comment extends _HOOK_CLASS_
         }
     }
 
-    public static function create( $item, $comment, $first=FALSE, $guestName=NULL, $incrementPostCount=NULL, $member=NULL, \IPS\DateTime $time=NULL ){
+    public static function create( $item, $comment, $first=FALSE, $guestName=NULL, $incrementPostCount=NULL, $member=NULL, \IPS\DateTime $time=NULL, $ipAddress=NULL, $hiddenStatus=NULL, $anonymous=NULL ){
         try
         {
             try
