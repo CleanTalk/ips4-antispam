@@ -27,7 +27,7 @@ class SFW extends FirewallModule {
      */
 	public function __construct( $data_table, $params = array() )
     {
-		$this->db_data_table_name = $data_table ?: null;
+		$this->db_data_table_name = \IPS\DB::i()->prefix . $data_table ?: null;
 		
 		foreach( $params as $param_name => $param ){
 			$this->$param_name = isset( $this->$param_name ) ? $param : false;
@@ -73,8 +73,10 @@ class SFW extends FirewallModule {
                 if( $status ) {
                     $results[] = array('ip' => $current_ip, 'is_personal' => false, 'status' => 'PASS_SFW__BY_WHITELIST',);
                 }
-					
-				return $results;
+
+                if(!empty($results)) {
+					return $results;
+				}
 			}
 		}
 		
