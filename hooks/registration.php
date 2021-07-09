@@ -54,7 +54,7 @@ class antispambycleantalk_hook_registration extends _HOOK_CLASS_
             }
         }
     }
-    public function ctCookiesTest()
+    public static function ctCookiesTest()
     {
         try
         {

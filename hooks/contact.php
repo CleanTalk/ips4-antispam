@@ -16,7 +16,7 @@ use Cleantalk\Common\Helper as CleantalkHelper;
 class antispambycleantalk_hook_contact extends _HOOK_CLASS_
 {
 
-    public function ctCookiesTest()
+    public static function ctCookiesTest()
     {
         try
         {

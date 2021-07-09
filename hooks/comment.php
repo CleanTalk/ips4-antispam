@@ -15,7 +15,7 @@ use Cleantalk\Common\Helper as CleantalkHelper;
 abstract class antispambycleantalk_hook_comment extends _HOOK_CLASS_
 {
 
-    public function ctCookiesTest()
+    public static function ctCookiesTest()
     {
         try
         {
