@@ -147,16 +147,6 @@ class antispambycleantalk_hook_contact extends _HOOK_CLASS_
                                 $js_keys[]=md5($config_key . '+' . \IPS\Settings::i()->email_in . date("Ymd",time()+86400*$i));
                             }
 
-                            $request_summary = implode(", ", array(
-                                'sender_ip'         => $sender_ip,
-                                'sender_info'       => $sender_info,
-                                'js_on'             => (\in_array($_COOKIE['ct_checkjs'], $js_keys) ? 1 : 0),
-                                'sender_nickname'   => ($member->member_id ? $member->name : $values['contact_name']),
-                                'sender_email'      => ($member->member_id ? $member->email : $values['email_address']),
-                                'message'           => $values['contact_text']
-                            ));
-
-
                             $ct_request = new CleantalkRequest();
 
                             $ct_request->auth_key           = $config_key;
