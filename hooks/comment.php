@@ -146,7 +146,7 @@ abstract class antispambycleantalk_hook_comment extends _HOOK_CLASS_
                         $ct_request->sender_email = $sender_email;
                         $ct_request->sender_info = $sender_info;
                         $ct_request->post_info = $post_info;
-                        $ct_request->agent = 'ipboard4-21';
+                        $ct_request->agent = 'ipboard4-22';
 
                         $js_keys=Array();
                         for($i=-5;$i<=1;$i++){
