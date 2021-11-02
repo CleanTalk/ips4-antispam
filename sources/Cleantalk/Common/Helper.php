@@ -1352,7 +1352,7 @@ class Helper
      */
     private static function getSiteUrl()
     {
-        return ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . ( isset($_SERVER['SCRIPT_URL'] ) ? $_SERVER['SCRIPT_URL'] : '' );
+        return ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . ( (isset( $_SERVER['SCRIPT_URL'] ) && strpos( $_SERVER['SCRIPT_URL'], '/admin' ) === false) ? $_SERVER['SCRIPT_URL'] : '' );
     }
 
     /**
