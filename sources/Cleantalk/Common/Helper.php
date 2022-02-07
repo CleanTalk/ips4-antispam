@@ -864,6 +864,10 @@ class Helper
 			
 			// Use presets
 			$presets = is_array($presets) ? $presets : explode(' ', $presets);
+			
+            // Unique presets
+            $presets = array_unique($presets);
+            
 			foreach($presets as $preset){
 				
 				switch($preset){
