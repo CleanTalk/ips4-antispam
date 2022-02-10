@@ -46,9 +46,9 @@ class RemoteCalls extends \Cleantalk\Common\RemoteCalls {
      */
     protected function setLastCall( $action )
     {
-        // TODO: Implement setLastCall() method.
         $remote_calls = $this->getAvailableRcActions();
-        $remote_calls[$action]['last_call'] = time();
+        $action_name = array_keys($action)[0];
+        $remote_calls[$action_name]['last_call'] = time();
         \IPS\Settings::i()->ct_remote_calls = $remote_calls;
     }
 }

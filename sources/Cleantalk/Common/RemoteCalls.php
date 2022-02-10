@@ -69,7 +69,11 @@ abstract class RemoteCalls
 
                 $actions[$action]['last_call'] = time();
 
-                $this->setLastCall( $actions[$action] );
+                $action_array = array(
+                    $action => $actions[$action]
+                );
+
+                $this->setLastCall( $action_array );
 
                 // Check API key
                 if( $token === strtolower( md5( $this->api_key ) ) ){
