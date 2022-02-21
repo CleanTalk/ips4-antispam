@@ -32,7 +32,8 @@ class DB extends \Cleantalk\Common\DB {
      * @return $this
      */
     public function prepare( $query, $vars = array() ) {
-
+        $this->db_result = \IPS\DB::i()->preparedQuery($query, $vars);
+        return $this->db_result;
     }
 
     /**
@@ -58,7 +59,7 @@ class DB extends \Cleantalk\Common\DB {
      */
     public function fetch( $query = false, $response_type = false ) {
         $this->result = \IPS\DB::i()->query($query)->fetch_row()[0];
-        
+
         return $this->result;
     }
 
