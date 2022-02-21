@@ -352,7 +352,7 @@ class FirewallUpdater
      */
     private function createTempTables()
     {
-        $sql = 'SHOW TABLES LIKE "%scleantalk_sfw";';
+        $sql = "SHOW TABLES LIKE '%scleantalk_sfw'";
         $sql = sprintf( $sql, $this->db->prefix ); // Adding current blog prefix
         $result = $this->db->fetch( $sql );
         if( ! $result ){
