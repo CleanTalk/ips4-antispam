@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <language>
- <app key="antispambycleantalk" version="20000">
+ <app key="antispambycleantalk" version="20022">
   <word key="__app_antispambycleantalk" js="0">Antispam by Cleantalk</word>
   <word key="ct_contact_form_check" js="0">Protect contact form</word>
   <word key="ct_moderate_new" js="0">Moderate new users posts</word>
@@ -14,5 +14,6 @@
   <word key="menu__antispambycleantalk_antispambycleantalk_settings" js="0">Settings</word>
   <word key="dashboard_key_is_empty_description" js="0">Please enter Access Key in Anti-Spam by CleanTalk settings to enable anti spam protection!</word>
   <word key="go_to_settings" js="0">Settings</word>
+  <word key="antispambycleantalk_privacy_description" js="0">This site uses the CleanTalk Anti-Spam service to protect the site from spam. The service uses Cookies and receives some information about the site visitor's browser and other data such as user name, e-mail addresses, IP and some other.</word>
  </app>
 </language>
