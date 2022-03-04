@@ -73,4 +73,17 @@ class _Application extends \IPS\Application
 
         return true;
 	}
+    /**
+     * @see \IPS\Application::privacyPolicyThirdParties()
+     */
+    public function privacyPolicyThirdParties()
+    {
+        return array(
+            array(
+                'title' => \IPS\Member::loggedIn()->language()->addToStack('__app_antispambycleantalk'),
+                'description' => \IPS\Member::loggedIn()->language()->addToStack('antispambycleantalk_privacy_description'),
+                'privacyUrl' => 'https://cleantalk.org/publicoffer',
+            )
+        );
+    }
 }
