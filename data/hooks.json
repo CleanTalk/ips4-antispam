@@ -22,5 +22,9 @@
     "contact": {
         "type": "C",
         "class": "\\IPS\\core\\modules\\front\\contact\\contact"
+    },
+    "add_topic": {
+        "type": "C",
+        "class": "\\IPS\\forums\\modules\\front\\forums\\forums"
     }
 }
