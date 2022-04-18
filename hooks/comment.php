@@ -132,6 +132,11 @@ abstract class antispambycleantalk_hook_comment extends _HOOK_CLASS_
 
                         $sender_email = filter_var($member->email, FILTER_SANITIZE_EMAIL);
 
+                        // Trying to get email from POST
+                        if (! $sender_email && isset($_POST['guest_email'])) {
+							$sender_email = filter_var($_POST['guest_email'], FILTER_SANITIZE_EMAIL);
+                        }
+
                         $ct_request = new CleantalkRequest();
                         $ct_request->auth_key = $config_key;
 
