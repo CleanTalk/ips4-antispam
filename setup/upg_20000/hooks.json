@@ -5,7 +5,8 @@
         "comment",
         "admin_actions",
         "mcheck",
-        "contact"
+        "contact",
+        "add_topic"
     ],
     "edited": [],
     "removed": []

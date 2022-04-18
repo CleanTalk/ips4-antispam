@@ -19,4 +19,5 @@
  <hook key="admin_actions"><![CDATA[{"type":"S","class":"\\IPS\\Theme\\class_core_admin_global"}]]></hook>
  <hook key="mcheck"><![CDATA[{"type":"C","class":"\\IPS\\core\\modules\\admin\\members\\members"}]]></hook>
  <hook key="contact"><![CDATA[{"type":"C","class":"\\IPS\\core\\modules\\front\\contact\\contact"}]]></hook>
+ <hook key="add_topic"><![CDATA[{"type":"C","class":"\\IPS\\forums\\modules\\front\\forums\\forums"}]]></hook>
 </build>
