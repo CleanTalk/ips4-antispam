@@ -68,16 +68,14 @@ class antispambycleantalk_hook_mcheck extends _HOOK_CLASS_
                                                 {
                                                     if($value->appears==1)
                                                     {
-                                                        if (! \in_array($key, $spam_users['ip']))
-                                                            $spam_users['ip'][] = $key;
+														$spam_users['ip'][] = $key;
                                                     }
                                                 }
                                                 else
                                                 {
                                                     if($value->appears==1)
                                                     {
-                                                        if (! \in_array($key, $spam_users['email']))
-                                                            $spam_users['email'][] = $key;
+														$spam_users['email'][] = $key;
                                                     }
                                                 }
                                             }
@@ -85,11 +83,20 @@ class antispambycleantalk_hook_mcheck extends _HOOK_CLASS_
                                     }
                                 }
                                 $start = $on_page + $start;
-                                foreach ($users as $key=>$value)
-                                {
-                                    if (\in_array($value['email'], $spam_users['email']) || \in_array($value['ip_address'], $spam_users['ip']))
-                                        \IPS\Db::i()->update( 'core_members', array( 'members_bitoptions' => '65537' ), array( 'member_id=?', $value['member_id']));
-                                }
+								if (!empty($spam_users['email']) || !empty($spam_users['ip'])) {
+									$spam_users['email'] = is_array($spam_users['email']) ? array_unique($spam_users['email']) : array();
+									$spam_users['ip'] = is_array($spam_users['ip']) ? array_unique($spam_users['ip']) : array();
+
+									foreach ($users as $key=>$value)
+									{
+										if (
+											(!empty($spam_users['email'] && in_array($value['email'], $spam_users['email'], true))) ||
+											(!empty($spam_users['ip'] && in_array($value['ip_address'], $spam_users['ip'], true)))
+										) {
+											\IPS\Db::i()->update('core_members', array('members_bitoptions' => '65537'), array('member_id=?', $value['member_id']));
+										}
+									}
+								}
                             }while (count($users) != 0);
                         }
 
