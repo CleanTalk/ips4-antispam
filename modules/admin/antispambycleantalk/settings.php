@@ -149,7 +149,7 @@ class _settings extends \IPS\Dispatcher\Controller
                 $block .= '<tr><td colspan="5" style="text-align: center">No spammers found.</td></tr>';
             }
 
-            $button = '<a target="_blank" title="Run spam check and proceed to the user\'s list" class="ipsUrl" href="?app=core&module=members&controller=members&sortby=joined&filter=members_filter_spam&ct_spam_check_run=1" >Click to check users for spam</a>';
+            $button = '<a target="_blank" title="Run spam check and proceed to the full list of users" class="ipsUrl" href="?app=core&module=members&controller=members&sortby=joined&filter=members_filter_spam&ct_spam_check_run=1" >Click to check users for spam</a>';
             $block .= '<tr><td colspan="5" style="text-align: center">' . $button . '</td></tr>';
             $block .= '</tbody></table>';
 
