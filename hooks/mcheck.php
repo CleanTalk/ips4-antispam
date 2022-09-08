@@ -74,32 +74,30 @@ class antispambycleantalk_hook_mcheck extends _HOOK_CLASS_
 
                                     if(isset($result->error_message))
                                     {
-                                        $error=$result->error_message;
-                                        CleantalkHelper::saveError($error,'users_spam_check');
-                                    }
-                                    else
-                                    {
-                                        if(isset($result->data))
+                                        CleantalkHelper::saveError($result->error_message,'users_spam_check');
+                                    } else
                                         {
-                                            foreach($result->data as $key=>$value)
+                                            if(isset($result->data))
                                             {
-                                                if($key === filter_var($key, FILTER_VALIDATE_IP))
+                                                foreach($result->data as $key=>$value)
                                                 {
-                                                    if($value->appears==1)
+                                                    if($key === filter_var($key, FILTER_VALIDATE_IP))
                                                     {
-														$spam_users['ip'][] = $key;
+                                                        if($value->appears==1)
+                                                        {
+                                                            $spam_users['ip'][] = $key;
+                                                        }
                                                     }
-                                                }
-                                                else
-                                                {
-                                                    if($value->appears==1)
+                                                    else
                                                     {
-														$spam_users['email'][] = $key;
+                                                        if($value->appears==1)
+                                                        {
+                                                            $spam_users['email'][] = $key;
+                                                        }
                                                     }
                                                 }
                                             }
                                         }
-                                    }
                                 }
                                 $start = $on_page + $start;
 								if (!empty($spam_users['email']) || !empty($spam_users['ip'])) {
