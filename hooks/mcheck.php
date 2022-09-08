@@ -17,9 +17,8 @@ class antispambycleantalk_hook_mcheck extends _HOOK_CLASS_
                 try
                 {
                     /* Create the table */
-                    $table = new \IPS\Helpers\Table\Db( 'core_members', \IPS\Http\Url::internal( 'app=core&module=members&controller=members' ), array( array( 'email<>?', '' ) ), 'joined' );
-
-                    if ($table->filter === 'members_filter_spam')
+                    $table = new \IPS\Helpers\Table\Db( 'core_members', \IPS\Http\Url::internal( 'app=core&module=members&controller=members' ), array( array( 'email<>?', 'members_bitoptions<>?', '', '65537') ), 'joined' );
+                    if ($table->filter === 'members_filter_spam' && \IPS\Request::i()->ct_spam_check_run == 1)
                     {
                         if ( \IPS\Settings::i()->ct_spam_check && isset(\IPS\Settings::i()->ct_access_key) )
                         {
