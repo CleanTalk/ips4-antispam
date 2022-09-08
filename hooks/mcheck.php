@@ -16,6 +16,7 @@ class antispambycleantalk_hook_mcheck extends _HOOK_CLASS_
             {
                 try
                 {
+                    $new_check_period = 60 * 60 * 24 * 7;
                     /* Create the table */
                     $table = new \IPS\Helpers\Table\Db( 'core_members', \IPS\Http\Url::internal( 'app=core&module=members&controller=members' ), array( array( 'email<>?', 'members_bitoptions<>?', '', '65537') ), 'joined' );
                     if ($table->filter === 'members_filter_spam' && \IPS\Request::i()->ct_spam_check_run == 1)
@@ -24,15 +25,29 @@ class antispambycleantalk_hook_mcheck extends _HOOK_CLASS_
                         {
                             $on_page = 25;
                             $start = 0;
+                            $history_select = \IPS\Db::i()->select( 'log_member,log_data,log_date','core_member_history', array('log_type=?','ct_check'))->setKeyField('log_member');
+                            $history = array();
+                            foreach ( $history_select as $key => $value ) {
+                                $history[$value['log_member']] = array(
+                                    'log_data' => $value['log_data'],
+                                    'log_date' => $value['log_date'],
+                                );
+                            }
+
                             do
                             {
                                 $select = \IPS\Db::i()->select( 'member_id,email,ip_address','core_members', null, null, array($start,$on_page));
                                 $select = $select->setKeyField( 'member_id' );
                                 $users = array();
                                 $spam_users = array();
-                                foreach( $select as $member_id => $value )
-                                    $users[] = $value;
-                                if (count($users)> 0)
+                                //filter users to check, take those who has no history or last check performed too long ago
+                                foreach( $select as $member_id => $value ) {
+                                    if (!\array_key_exists($member_id,$history) || time()-(int)$history[$member_id]['log_date'] > $new_check_period) {
+                                        $users[] = $value;
+                                    }
+                                }
+
+                                if (\count($users)> 0)
                                 {
                                     foreach ($users as $key=>$value)
                                     {
@@ -83,20 +98,23 @@ class antispambycleantalk_hook_mcheck extends _HOOK_CLASS_
                                 }
                                 $start = $on_page + $start;
 								if (!empty($spam_users['email']) || !empty($spam_users['ip'])) {
-									$spam_users['email'] = is_array($spam_users['email']) ? array_unique($spam_users['email']) : array();
-									$spam_users['ip'] = is_array($spam_users['ip']) ? array_unique($spam_users['ip']) : array();
-
-									foreach ($users as $key=>$value)
-									{
-										if (
-											(!empty($spam_users['email'] && in_array($value['email'], $spam_users['email'], true))) ||
-											(!empty($spam_users['ip'] && in_array($value['ip_address'], $spam_users['ip'], true)))
-										) {
-											\IPS\Db::i()->update('core_members', array('members_bitoptions' => '65537'), array('member_id=?', $value['member_id']));
-										}
-									}
-								}
-                            }while (count($users) != 0);
+									$spam_users['email'] = \is_array($spam_users['email']) ? array_unique($spam_users['email']) : array();
+									$spam_users['ip'] = \is_array($spam_users['ip']) ? array_unique($spam_users['ip']) : array();
+                                }
+                                foreach ($users as $key=>$value)
+                                {
+                                    if (
+                                        (!empty($spam_users['email'] && \in_array($value['email'], $spam_users['email'], true))) ||
+                                        (!empty($spam_users['ip'] && \in_array($value['ip_address'], $spam_users['ip'], true)))
+                                    ) {
+                                        \IPS\Db::i()->update('core_members', array('members_bitoptions' => '65537'), array('member_id=?', $value['member_id']));
+                                        $is_spam = '1';
+                                    } else {
+                                        $is_spam = '0';
+                                    }
+                                    $this->ctRefreshSpamCheckHistory($value['member_id'],$is_spam);
+                                }
+                            }while (\count($users) != 0);
                         }
 
                     }
@@ -135,5 +153,19 @@ class antispambycleantalk_hook_mcheck extends _HOOK_CLASS_
                 throw $e;
             }
         }
+    }
+
+    protected function ctRefreshSpamCheckHistory($member_id,$is_spam){
+        \IPS\Db::i()->delete('core_member_history', array(
+                'log_member=?',$member_id
+            )
+        );
+        \IPS\Db::i()->insert('core_member_history', array(
+                'log_member' => $member_id,
+                'log_type' => 'ct_check',
+                'log_data' => json_encode(array('spammer'=>$is_spam)),
+                'log_date' => time()
+            )
+        );
     }
 }
