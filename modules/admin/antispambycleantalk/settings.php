@@ -9,6 +9,7 @@ require_once(\IPS\Application::getRootPath().'/applications/antispambycleantalk/
 use Cleantalk\Antispam\Cleantalk as Cleantalk;
 use Cleantalk\Antispam\CleantalkRequest as CleantalkRequest;
 use Cleantalk\Antispam\CleantalkResponse as CleantalkResponse;
+use Cleantalk\ApbctIPS\Helper as CleantalkHelper;
 
 /* To prevent PHP errors (extending class does not exist) revealing path */
 
@@ -44,6 +45,8 @@ class _settings extends \IPS\Dispatcher\Controller
     protected function manage()
     {
         // This is the default method if no 'do' parameter is specified
+        //Errors handler
+        CleantalkHelper::drawOutputErrors(CleantalkHelper::getErrors('users_spam_check'));
         # Build Form
         $form = new \IPS\Helpers\Form;
         $form->add( new \IPS\Helpers\Form\YesNo( 'ct_moderate_new', \IPS\Settings::i()->ct_moderate_new, FALSE, array( 'app' => 'core', 'key' => 'Admin', 'autoSaveKey' => 'ct_moderate_new' ) ) );
@@ -84,7 +87,7 @@ class _settings extends \IPS\Dispatcher\Controller
             }
 
             $form->saveAsSettings( $values );
-
+            CleantalkHelper::clearErrors();
         }
 
         // Show admin notification about empty key

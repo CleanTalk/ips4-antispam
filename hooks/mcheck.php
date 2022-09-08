@@ -1,5 +1,7 @@
 //<?php
 
+use Cleantalk\ApbctIPS\Helper as CleantalkHelper;
+
 /* To prevent PHP errors (extending class does not exist) revealing path */
 if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 {
@@ -16,6 +18,7 @@ class antispambycleantalk_hook_mcheck extends _HOOK_CLASS_
             {
                 try
                 {
+                    CleantalkHelper::clearErrors('users_spam_check');
                     $new_check_period = 60 * 60 * 24 * 7;
                     /* Create the table */
                     $table = new \IPS\Helpers\Table\Db( 'core_members', \IPS\Http\Url::internal( 'app=core&module=members&controller=members' ), array( array( 'email<>?', 'members_bitoptions<>?', '', '65537') ), 'joined' );
@@ -67,10 +70,12 @@ class antispambycleantalk_hook_mcheck extends _HOOK_CLASS_
                                     $context = stream_context_create($opts);
                                     $result = @file_get_contents("https://api.cleantalk.org/?method_name=spam_check_cms&auth_key=".trim(\IPS\Settings::i()->ct_access_key), 0, $context);
 
-                                    $result=json_decode($result);
+                                    $result = CleantalkHelper::JsonDecode($result);
+
                                     if(isset($result->error_message))
                                     {
                                         $error=$result->error_message;
+                                        CleantalkHelper::saveError($error,'users_spam_check');
                                     }
                                     else
                                     {
@@ -155,17 +160,20 @@ class antispambycleantalk_hook_mcheck extends _HOOK_CLASS_
         }
     }
 
-    protected function ctRefreshSpamCheckHistory($member_id,$is_spam){
-        \IPS\Db::i()->delete('core_member_history', array(
-                'log_member=?',$member_id
-            )
-        );
-        \IPS\Db::i()->insert('core_member_history', array(
-                'log_member' => $member_id,
-                'log_type' => 'ct_check',
-                'log_data' => json_encode(array('spammer'=>$is_spam)),
-                'log_date' => time()
-            )
-        );
+    protected function ctRefreshSpamCheckHistory($member_id, $is_spam)
+    {
+        if ( !empty($member_id) && !empty($is_spam) ) {
+            \IPS\Db::i()->delete('core_member_history', array(
+                    'log_member=?', $member_id
+                )
+            );
+            \IPS\Db::i()->insert('core_member_history', array(
+                    'log_member' => $member_id,
+                    'log_type' => 'ct_check',
+                    'log_data' => CleantalkHelper::JsonEncode(array('spammer' => $is_spam)),
+                    'log_date' => time()
+                )
+            );
+        }
     }
 }
