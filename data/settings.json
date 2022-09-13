@@ -46,5 +46,9 @@
     {
         "key": "ct_work_url",
         "default": "0"
+    },
+    {
+        "key": "ct_errors",
+        "default": ""
     }
 ]
