@@ -77,20 +77,20 @@ class antispambycleantalk_hook_mcheck extends _HOOK_CLASS_
                                         CleantalkHelper::saveError($result->error_message,'users_spam_check');
                                     } else
                                         {
-                                            if(isset($result->data))
+                                            if(isset($result['data']))
                                             {
-                                                foreach($result->data as $key=>$value)
+                                                foreach($result['data'] as $key=>$value)
                                                 {
                                                     if($key === filter_var($key, FILTER_VALIDATE_IP))
                                                     {
-                                                        if($value->appears==1)
+                                                        if($value['appears']==1)
                                                         {
                                                             $spam_users['ip'][] = $key;
                                                         }
                                                     }
                                                     else
                                                     {
-                                                        if($value->appears==1)
+                                                        if($value['appears']==1)
                                                         {
                                                             $spam_users['email'][] = $key;
                                                         }
