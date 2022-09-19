@@ -43,6 +43,7 @@ class antispambycleantalk_hook_mcheck extends _HOOK_CLASS_
                                 $select = $select->setKeyField( 'member_id' );
                                 $users = array();
                                 $spam_users = array();
+                                $data = array();
                                 //filter users to check, take those who has no history or last check performed too long ago
                                 foreach( $select as $member_id => $value ) {
                                     if (!\array_key_exists($member_id,$history) || time()-(int)$history[$member_id]['log_date'] > $new_check_period) {
@@ -58,7 +59,7 @@ class antispambycleantalk_hook_mcheck extends _HOOK_CLASS_
                                         $data[]=$value['ip_address'];
                                     }
 
-                                    $send=implode(',',array_unique($data));;
+                                    $send=implode(',',array_unique($data));
                                     $req="data=$send";
                                     $opts = array(
                                         'http'=>array(
