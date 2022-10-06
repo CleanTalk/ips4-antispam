@@ -180,7 +180,7 @@ class antispambycleantalk_hook_registration extends _HOOK_CLASS_
                         $ct_request->sender_email = $sender_email;
                         $ct_request->sender_info = $sender_info;
                         $ct_request->post_info = $post_info;
-                        $ct_request->agent = 'ipboard4-221';
+                        $ct_request->agent = 'ipboard4-222';
 
                         //$ct_request->js_on = $_COOKIE['ct_checkjs'] == md5(\IPS\Settings::i()->ct_access_key . '+' . \IPS\Settings::i()->email_in) ? 1 : 0;
                         $ct_request->js_on = \in_array($_COOKIE['ct_checkjs'], self::getCheckJSArray()) ? 1 : 0;
