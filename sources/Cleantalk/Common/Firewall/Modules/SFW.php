@@ -43,6 +43,11 @@ class SFW extends FirewallModule {
     {
 		$results = array();
         $status = 0;
+
+        if ( $this->test ) {
+            unset($_COOKIE['ct_sfw_pass_key']);
+            \Cleantalk\Common\Helper::apbct_cookie__set( 'ct_sfw_pass_key', '0', time() + 86400 * 3, '/', null, false, true, 'Lax' );
+        }
 		
 		// Skip by cookie
 		foreach( $this->ip_array as $current_ip ){
@@ -99,16 +104,24 @@ class SFW extends FirewallModule {
 				AND " . rand( 1, 100000 ) . "  
 				ORDER BY status DESC");
 
+            $test_status = 1;
 			if( ! empty( $db_results ) ){
 				
 				foreach( $db_results as $db_result ){
 
 					if( $db_result['status'] == 1 ) {
                         $results[] = array('ip' => $current_ip, 'is_personal' => false, 'status' => 'PASS_SFW__BY_WHITELIST',);
+                        if ($this->test){
+                            continue;
+                        }
                         break;
                     }
-					else
-						$results[] = array('ip' => $current_ip, 'is_personal' => false, 'status' => 'DENY_SFW',);
+
+					if ( $db_result['status'] == 0 ) {
+                        $results[] = array('ip' => $current_ip, 'is_personal' => false, 'status' => 'DENY_SFW',);
+                    }
+
+                    $test_status = (int)$db_result['status'];
 				}
 
 			}else{
@@ -116,6 +129,9 @@ class SFW extends FirewallModule {
 				$results[] = array( 'ip' => $current_ip, 'is_personal' => false, 'status' => 'PASS_SFW' );
 				
 			}
+            if ( $this->test && $origin === 'sfw_test' ) {
+                $this->test_status = $test_status;
+            }
 		}
 
 		return $results;
@@ -232,6 +248,21 @@ class SFW extends FirewallModule {
 				'{TEST_IP}'         => '',
 				'{REAL_IP}'         => '',
 			);
+
+            /**
+             * Message about IP status
+             */
+            if ( $this->test ) {
+                $message_ip_status = 'IP is blacklisted';
+                $message_ip_status_color = 'red';
+
+                if ($this->test_status === 1) {
+                    $message_ip_status = 'IP is passed';
+                    $message_ip_status_color = 'green';
+                }
+
+                $replaces['{MESSAGE_IP_STATUS}'] = "<h3 style='color:$message_ip_status_color;'>$message_ip_status</h3>";
+            }
 			
 			// Test
 			if($this->test){

@@ -24,10 +24,13 @@ class Cookie extends SuperGlobalVariables{
 		// Return from memory. From $this->variables
 		if(isset(static::$instance->variables[$name]))
 			return static::$instance->variables[$name];
-		
-		if( function_exists( 'filter_input' ) )
-			$value = filter_input( INPUT_COOKIE, $name );
-		
+
+        if( function_exists( 'filter_input' ) ){
+            if ( isset($_COOKIE[ $name ])){
+                $value = filter_input( INPUT_COOKIE, $name );
+            }
+        }
+
 		if( empty( $value ) )
 			$value = isset( $_COOKIE[ $name ] ) ? $_COOKIE[ $name ]	: '';
 		

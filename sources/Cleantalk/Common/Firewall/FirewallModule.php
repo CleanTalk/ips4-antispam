@@ -67,7 +67,7 @@ abstract class FirewallModule {
 	/**
 	 * @var bool
 	 */
-	protected $test;
+    protected $test;
 
     /**
      * @var bool

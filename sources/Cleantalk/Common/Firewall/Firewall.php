@@ -230,9 +230,11 @@ class Firewall
 					$this->fw_modules[ $module_name ]->actionsForDenied( $result );
 					$this->fw_modules[ $module_name ]->_die( $result );
 
-					
 				// Allowed
 				}else{
+                    if ( Get::get('sfw_test_ip') ) {
+                        $this->fw_modules[$module_name]->_die($result);
+                    }
 					$this->fw_modules[ $module_name ]->actionsForPassed( $result );
 				}
 			}
