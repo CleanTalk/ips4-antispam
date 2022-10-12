@@ -2,14 +2,10 @@
 
 namespace Cleantalk\Common\Firewall\Modules;
 
-use Cleantalk\Common\Firewall\Firewall;
-use Cleantalk\Common\Firewall\FirewallModule;
-use Cleantalk\Common\Schema;
 use Cleantalk\Common\Variables\Cookie;
-use Cleantalk\Common\Variables\Get;
 use Cleantalk\Common\Variables\Server;
 
-class SFW extends FirewallModule {
+class SFW extends \Cleantalk\Common\Firewall\FirewallModule {
 
     public $module_name = 'SFW';
 

@@ -1,6 +1,7 @@
 <?php
 
 namespace Cleantalk\ApbctIPS;
+use IPS\Db as IpsDB;
 
 class DB extends \Cleantalk\Common\DB {
     /**
@@ -9,7 +10,7 @@ class DB extends \Cleantalk\Common\DB {
      * Set tables prefix.
      */
     protected function init() {
-        $this->prefix = \IPS\DB::i()->prefix;
+        $this->prefix = IpsDB::i()->prefix;
     }
 
     /**
@@ -32,7 +33,7 @@ class DB extends \Cleantalk\Common\DB {
      * @return $this
      */
     public function prepare( $query, $vars = array() ) {
-        $this->db_result = \IPS\DB::i()->preparedQuery($query, $vars);
+        $this->db_result = IpsDB::i()->preparedQuery($query, $vars);
         return $this->db_result;
     }
 
@@ -44,7 +45,7 @@ class DB extends \Cleantalk\Common\DB {
      * @return bool|int Raw result
      */
     public function execute( $query ) {
-        $this->db_result = \IPS\DB::i()->query($query);
+        $this->db_result = IpsDB::i()->query($query);
         return $this->db_result;
     }
 
@@ -58,7 +59,7 @@ class DB extends \Cleantalk\Common\DB {
      * @return array|object|void|null
      */
     public function fetch( $query = false, $response_type = false ) {
-        $this->result = \IPS\DB::i()->query($query)->fetch_row()[0];
+        $this->result = IpsDB::i()->query($query)->fetch_row()[0];
 
         return $this->result;
     }
@@ -73,7 +74,7 @@ class DB extends \Cleantalk\Common\DB {
      * @return array|object|null
      */
     public function fetch_all( $query = false, $response_type = false ) {
-        foreach (\IPS\DB::i()->query($query) as $row) {
+        foreach (IpsDB::i()->query($query) as $row) {
             $this->result[] = $row;
         }
         return $this->result;
