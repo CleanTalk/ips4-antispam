@@ -146,6 +146,7 @@ class antispambycleantalk_hook_registration extends _HOOK_CLASS_
                             'page_set_timestamp' => $page_set_timestamp,
                             'REFFERRER_PREVIOUS' => isset($_COOKIE['ct_prev_referer'])?$_COOKIE['ct_prev_referer']:null,
                             'cookies_enabled' => self::ctCookiesTest(),
+                            'site_url' => $_SERVER['HTTP_HOST'],
                         );
                         $sender_info = json_encode($arr);
 
