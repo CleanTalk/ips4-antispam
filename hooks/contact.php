@@ -72,15 +72,8 @@ class antispambycleantalk_hook_contact extends _HOOK_CLASS_
                 try{
 
                     $contact_form_check     = \IPS\Settings::i()->ct_contact_form_check;
-                    // die('aaa');
-                    if ( \IPS\Request::i()->isAjax() )
-                    {
-                        // die('abc');
-                        // \IPS\Output::i()->script = 'ic3po';
-                    }
 
-                    if( $contact_form_check ){
-
+                    if ($contact_form_check) {
                         $form = new \IPS\Helpers\Form( 'contact', 'send' );
                         $form->class = 'ipsForm_vertical';
                         $member = \IPS\Member::loggedIn();
