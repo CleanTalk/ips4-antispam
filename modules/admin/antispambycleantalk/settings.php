@@ -72,7 +72,7 @@ class _settings extends \IPS\Dispatcher\Controller
 
             $ct_request = new CleantalkRequest();
             $ct_request->auth_key = $values['ct_access_key'];
-            $ct_request->feedback = '0:ipboard4-221';
+            $ct_request->feedback = '0:ipboard4-222';
             $ct->sendFeedback($ct_request);
             if ($ct->server_change)
             {
