@@ -55,17 +55,6 @@ class antispambycleantalk_hook_sfw_js extends _HOOK_CLASS_
                     $ct_show_link=\IPS\Settings::i()->ct_show_link;
                     $html = '
                                     <script type="text/javascript">
-                                        function ctCheckContactAjax(form) {
-                                            var origForm = form;
-                                            var parrent = form.parentElement;
-                                            form.parentElement.removeChild(form);
-                                            parrent.appendChild(origForm)
-                                        }
-                                        var form = document.querySelector("form[action$=\'index.php?/contact/\']");
-                                        if (form && window.location.href.indexOf(\'index.php?/contact/\') === -1) {
-                                            ctCheckContactAjax(form);
-                                        }
-
                                         function ctSetCookie(c_name, value) {
                                             document.cookie = c_name + "=" + encodeURIComponent(value) + "; path=/";
                                         }

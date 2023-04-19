@@ -193,7 +193,7 @@ class antispambycleantalk_hook_contact extends _HOOK_CLASS_
                                     if ( \IPS\Request::i()->isAjax() )
                                     {
                                         $result=Array("type"=>"error","message"=>$ct_result->comment);
-                                        \IPS\Output::i()->json($result);
+                                        \IPS\Output::i()->jsonError($result);
                                     }
                                     else
                                     {
