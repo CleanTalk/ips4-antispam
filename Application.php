@@ -58,6 +58,7 @@ class _Application extends \IPS\Application
         $fw_updater = $firewall->getUpdater( APBCT_TBL_FIREWALL_DATA );
         $fw_updater->update();
 	    
+        return true;
 	}
 	static public function apbct_sfw_send_logs($access_key = '') {
 	    if( empty( $access_key ) ){
