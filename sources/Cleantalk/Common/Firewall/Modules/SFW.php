@@ -13,6 +13,7 @@ class SFW extends \Cleantalk\Common\Firewall\FirewallModule {
 	private $sfw_counter = false;
 	private $set_cookies = false;
 	private $cookie_domain = false;
+	private $test_status = 1;
 
     /**
      * FireWall_module constructor.
@@ -248,17 +249,13 @@ class SFW extends \Cleantalk\Common\Firewall\FirewallModule {
             /**
              * Message about IP status
              */
-            if ( $this->test ) {
-                $message_ip_status = 'IP is blacklisted';
-                $message_ip_status_color = 'red';
-
-                if ($this->test_status === 1) {
-                    $message_ip_status = 'IP is passed';
-                    $message_ip_status_color = 'green';
-                }
-
-                $replaces['{MESSAGE_IP_STATUS}'] = "<h3 style='color:$message_ip_status_color;'>$message_ip_status</h3>";
+			$message_ip_status = 'IP is blacklisted';
+			$message_ip_status_color = 'red';
+            if ($this->test && $this->test_status === 1) {
+				$message_ip_status = 'IP is passed';
+				$message_ip_status_color = 'green';
             }
+			$replaces['{MESSAGE_IP_STATUS}'] = "<h3 style='color:$message_ip_status_color;'>$message_ip_status</h3>";
 			
 			// Test
 			if($this->test){

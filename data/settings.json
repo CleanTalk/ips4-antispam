@@ -50,5 +50,9 @@
     {
         "key": "ct_errors",
         "default": ""
+    },
+    {
+        "key": "cleantalk_cron",
+        "default": ""
     }
 ]
