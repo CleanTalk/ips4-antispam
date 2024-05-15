@@ -12,7 +12,7 @@ use Cleantalk\ApbctIPS\Cron;
 use Cleantalk\Common\Firewall\Firewall;
 use Cleantalk\ApbctIPS\DB;
 use Cleantalk\Common\Variables\Server;
-use Cleantalk\Common\Firewall\Modules\SFW;
+use Cleantalk\ApbctIPS\SFW;
 
 class antispambycleantalk_hook_sfw_js extends _HOOK_CLASS_
 {
