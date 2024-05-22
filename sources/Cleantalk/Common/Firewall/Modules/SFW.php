@@ -251,7 +251,7 @@ class SFW extends \Cleantalk\Common\Firewall\FirewallModule {
              */
 			$message_ip_status = 'IP is blacklisted';
 			$message_ip_status_color = 'red';
-            if ($this->test && $this->test_status === 1) {
+            if ($this->test && ($this->test_status === 1 || (int)$status === 1)) {
 				$message_ip_status = 'IP is passed';
 				$message_ip_status_color = 'green';
             }
