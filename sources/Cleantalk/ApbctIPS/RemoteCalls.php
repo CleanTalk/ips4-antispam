@@ -10,7 +10,7 @@ class RemoteCalls extends \Cleantalk\Common\RemoteCalls {
      */
     public function action__sfw_update()
     {
-        return \IPS\antispambycleantalk\_Application::apbct_sfw_update( $this->api_key );
+        return \IPS\antispambycleantalk\Application::apbct_sfw_update( $this->api_key );
     }
 
     /**
@@ -20,12 +20,12 @@ class RemoteCalls extends \Cleantalk\Common\RemoteCalls {
      */
     public function action__sfw_send_logs()
     {
-        return \IPS\antispambycleantalk\_Application::apbct_sfw_send_logs( $this->api_key );
+        return \IPS\antispambycleantalk\Application::apbct_sfw_send_logs( $this->api_key );
     }
 
     public function action__sfw_update__write_base()
     {
-        return \IPS\antispambycleantalk\_Application::apbct_sfw_update( $this->api_key );
+        return \IPS\antispambycleantalk\Application::apbct_sfw_update( $this->api_key );
     }
     /**
      * Get available remote calls from the storage.

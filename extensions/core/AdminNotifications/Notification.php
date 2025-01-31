@@ -20,29 +20,29 @@ if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 /**
  * ACP  Notification Extension
  */
-class _notification extends \IPS\core\AdminNotification
+class notification extends \IPS\core\AdminNotification
 {	
 	/**
 	 * @brief	Identifier for what to group this notification type with on the settings form
 	 */
-	public static $group = 'system';
+	public static string $group = 'system';
 	
 	/**
 	 * @brief	Priority 1-5 (1 being highest) for this group compared to others
 	 */
-	public static $groupPriority = 3;
+	public static int $groupPriority = 3;
 	
 	/**
 	 * @brief	Priority 1-5 (1 being highest) for this notification type compared to others in the same group
 	 */
-	public static $itemPriority = 1;
+	public static int $itemPriority = 1;
 	
 	/**
 	 * Title for settings
 	 *
 	 * @return	string
 	 */
-	public static function settingsTitle()
+	public static function settingsTitle() : string
 	{
 		return 'Antispam by Cleantalk';
 	}
@@ -53,7 +53,7 @@ class _notification extends \IPS\core\AdminNotification
 	 * @param	\IPS\Member	$member	The member
 	 * @return	bool
 	 */
-	public static function permissionCheck( \IPS\Member $member )
+	public static function permissionCheck( \IPS\Member $member ) : bool
 	{
 		return true;// $member->hasAcpRestriction( ... );
 	}
@@ -63,7 +63,7 @@ class _notification extends \IPS\core\AdminNotification
 	 *
 	 * @return	string
 	 */
-	public static function mayBeOptional()
+	public static function mayBeOptional() : bool
 	{
 		return FALSE;
 	}
@@ -73,7 +73,7 @@ class _notification extends \IPS\core\AdminNotification
 	 *
 	 * @return	bool
 	 */
-	public static function mayRecur()
+	public static function mayRecur() :	bool
 	{
 		return FALSE;
 	}
@@ -83,7 +83,7 @@ class _notification extends \IPS\core\AdminNotification
 	 *
 	 * @return	string
 	 */
-	public function title()
+	public function title() : string
 	{
 		return "Antispam by Cleantalk";
 	}
@@ -93,7 +93,7 @@ class _notification extends \IPS\core\AdminNotification
 	 *
 	 * @return	string
 	 */
-	public function body()
+	public function body() : string
 	{
         return \IPS\Theme::i()->getTemplate( 'notifications', 'antispambycleantalk' )->keyIsEmpty();
 	}
@@ -103,7 +103,7 @@ class _notification extends \IPS\core\AdminNotification
 	 *
 	 * @return	string
 	 */
-	public function severity()
+	public function severity() : string
 	{
 		return static::SEVERITY_HIGH;
 	}
@@ -113,7 +113,7 @@ class _notification extends \IPS\core\AdminNotification
 	 *
 	 * @return	string
 	 */
-	public function dismissible()
+	public function dismissible() : string
 	{
 		return static::DISMISSIBLE_TEMPORARY;
 	}
@@ -123,7 +123,7 @@ class _notification extends \IPS\core\AdminNotification
 	 *
 	 * @return	bool
 	 */
-	public function style()
+	public function style() : string
 	{
 	    $request = \IPS\Request::i();
 	    $current_url_obj = $request->url();
@@ -142,7 +142,7 @@ class _notification extends \IPS\core\AdminNotification
 	 *
 	 * @return	\IPS\Http\Url
 	 */
-	public function link()
+	public function link() : \IPS\Http\Url
 	{
         return \IPS\Http\Url::internal( 'app=antispambycleantalk&module=antispambycleantalk&controller=settings', 'admin' );
 	}

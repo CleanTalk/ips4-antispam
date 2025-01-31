@@ -21,7 +21,7 @@ if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 /**
  * Uninstall callback
  */
-class _antispambycleantalk
+class antispambycleantalk
 {
 	/**
 	 * Code to execute before the application has been uninstalled

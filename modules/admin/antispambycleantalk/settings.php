@@ -24,14 +24,14 @@ if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 /**
  * apbct_settings
  */
-class _settings extends \IPS\Dispatcher\Controller
+class settings extends \IPS\Dispatcher\Controller
 {
     /**
      * Execute
      *
      * @return  void
      */
-    public function execute()
+    public function execute(): void
     {
         \IPS\Dispatcher::i()->checkAcpPermission( 'settings_manage' );
         parent::execute();
@@ -82,8 +82,8 @@ class _settings extends \IPS\Dispatcher\Controller
             }
 
             if( $values['ct_cleantalk_sfw'] == 1 ){
-                \IPS\antispambycleantalk\_Application::apbct_sfw_update( $values['ct_access_key']);
-                \IPS\antispambycleantalk\_Application::apbct_sfw_send_logs( $values['ct_access_key']);
+                \IPS\antispambycleantalk\Application::apbct_sfw_update( $values['ct_access_key']);
+                \IPS\antispambycleantalk\Application::apbct_sfw_send_logs( $values['ct_access_key']);
             }
 
             $form->saveAsSettings( $values );

@@ -108,7 +108,8 @@ class antispambycleantalk_hook_registration extends _HOOK_CLASS_
      * @return  void
      * @note    We have to be careful when upgrading in case we are coming from an older version
      */
-    public function save(){
+    public function save()
+    {
         try
         {
             try

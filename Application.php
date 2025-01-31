@@ -29,7 +29,8 @@ define('APBCT_WRITE_LIMIT',       5000); // Write limit for firewall data.
 /**
  * Antispam by Cleantalk Application Class
  */
-class _Application extends \IPS\Application
+var_dump('Application.php');
+class Application extends \IPS\Application
 {
     public function installOther() {
 
@@ -77,7 +78,7 @@ class _Application extends \IPS\Application
     /**
      * @see \IPS\Application::privacyPolicyThirdParties()
      */
-    public function privacyPolicyThirdParties()
+    public function privacyPolicyThirdParties() : array
     {
         return array(
             array(

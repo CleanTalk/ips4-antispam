@@ -5,6 +5,7 @@ namespace Cleantalk\ApbctIPS;
 use Cleantalk\Common\Variables\Cookie;
 
 class SFW extends \Cleantalk\Common\Firewall\Modules\SFW {
+	protected $test_status;
 	public function check()
     {
 		$results = array();

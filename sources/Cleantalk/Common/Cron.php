@@ -222,13 +222,13 @@ abstract class Cron
 
         foreach( $tasks as $task ){
 
-            if( method_exists( '\IPS\antispambycleantalk\_Application',$this->tasks[$task]['handler'] ) ){
+            if( method_exists( '\IPS\antispambycleantalk\Application',$this->tasks[$task]['handler'] ) ){
 
                 if( $this->debug ) {
                     error_log( var_export( 'Task ' . $task . ' will be run.', 1 ) );
                 }
 
-                $result = call_user_func_array( '\IPS\antispambycleantalk\_Application::'.$this->tasks[$task]['handler'], isset( $this->tasks[$task]['params'] ) ? $this->tasks[$task]['params'] : array() );
+                $result = call_user_func_array( '\IPS\antispambycleantalk\Application::'.$this->tasks[$task]['handler'], isset( $this->tasks[$task]['params'] ) ? $this->tasks[$task]['params'] : array() );
 
                 if( $this->debug ) {
                     error_log( var_export( 'Result:', 1 ) );
