@@ -21,7 +21,7 @@ if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 /**
  * Uninstall callback
  */
-class antispambycleantalk
+class Antispambycleantalk  extends \IPS\Extensions\UninstallAbstract
 {
 	/**
 	 * Code to execute before the application has been uninstalled
@@ -29,8 +29,8 @@ class antispambycleantalk
 	 * @param	string	$application	Application directory
 	 * @return	array
 	 */
-	public function preUninstall( $application )
-	{
+	public function preUninstall( $application ): void
+    {
 	}
 
 	/**
@@ -39,8 +39,8 @@ class antispambycleantalk
 	 * @param	string	$application	Application directory
 	 * @return	array
 	 */
-	public function postUninstall( $application )
-	{
+	public function postUninstall( $application ): void
+    {
 	}
 
 	/**
@@ -62,7 +62,7 @@ class antispambycleantalk
 	 * @param	int		$plugin			Plugin ID
 	 * @return	void
 	 */
-	public function onOtherUninstall( $application=NULL, $plugin=NULL )
-	{
+	public function onOtherUninstall( $application=NULL, $plugin=NULL ): void
+    {
 	}
 }

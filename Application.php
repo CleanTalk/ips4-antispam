@@ -6,9 +6,9 @@
  * @package		Invision Community
  * @subpackage	Antispam by Cleantalk
  * @since		26 Oct 2020
- * @version		
+ * @version
  */
- 
+
 namespace IPS\antispambycleantalk;
 
 require_once(\IPS\Application::getRootPath().'/applications/antispambycleantalk/sources/autoload.php');
@@ -29,7 +29,6 @@ define('APBCT_WRITE_LIMIT',       5000); // Write limit for firewall data.
 /**
  * Antispam by Cleantalk Application Class
  */
-var_dump('Application.php');
 class Application extends \IPS\Application
 {
     public function installOther() {
@@ -49,7 +48,7 @@ class Application extends \IPS\Application
         	if (empty($access_key)) {
         		return false;
         	}
-	    }     
+	    }
         $firewall = new Firewall(
             $access_key,
             DB::getInstance(),
@@ -58,7 +57,7 @@ class Application extends \IPS\Application
         $firewall->setSpecificHelper( new CleantalkHelper() );
         $fw_updater = $firewall->getUpdater( APBCT_TBL_FIREWALL_DATA );
         $fw_updater->update();
-	    
+
         return true;
 	}
 	static public function apbct_sfw_send_logs($access_key = '') {
@@ -67,7 +66,7 @@ class Application extends \IPS\Application
         	if (empty($access_key)) {
         		return false;
         	}
-	    } 
+	    }
 
         $firewall = new Firewall( $access_key, DB::getInstance(), APBCT_TBL_FIREWALL_LOG );
 		$firewall->setSpecificHelper( new CleantalkHelper() );

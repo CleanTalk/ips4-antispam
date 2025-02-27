@@ -20,23 +20,23 @@ if ( !\defined( '\IPS\SUITE_UNIQUE_KEY' ) )
 /**
  * ACP  Notification Extension
  */
-class notification extends \IPS\core\AdminNotification
-{	
+class Notification extends \IPS\core\AdminNotification
+{
 	/**
 	 * @brief	Identifier for what to group this notification type with on the settings form
 	 */
 	public static string $group = 'system';
-	
+
 	/**
 	 * @brief	Priority 1-5 (1 being highest) for this group compared to others
 	 */
 	public static int $groupPriority = 3;
-	
+
 	/**
 	 * @brief	Priority 1-5 (1 being highest) for this notification type compared to others in the same group
 	 */
 	public static int $itemPriority = 1;
-	
+
 	/**
 	 * Title for settings
 	 *
@@ -46,7 +46,7 @@ class notification extends \IPS\core\AdminNotification
 	{
 		return 'Antispam by Cleantalk';
 	}
-	
+
 	/**
 	 * Can a member access this type of notification?
 	 *
@@ -57,7 +57,7 @@ class notification extends \IPS\core\AdminNotification
 	{
 		return true;// $member->hasAcpRestriction( ... );
 	}
-	
+
 	/**
 	 * Is this type of notification ever optional (controls if it will be selectable as "viewable" in settings)
 	 *
@@ -67,7 +67,7 @@ class notification extends \IPS\core\AdminNotification
 	{
 		return FALSE;
 	}
-	
+
 	/**
 	 * Is this type of notification might recur (controls what options will be available for the email setting)
 	 *
@@ -77,7 +77,7 @@ class notification extends \IPS\core\AdminNotification
 	{
 		return FALSE;
 	}
-			
+
 	/**
 	 * Notification Title (full HTML, must be escaped where necessary)
 	 *
@@ -87,7 +87,7 @@ class notification extends \IPS\core\AdminNotification
 	{
 		return "Antispam by Cleantalk";
 	}
-	
+
 	/**
 	 * Notification Body (full HTML, must be escaped where necessary)
 	 *
@@ -97,7 +97,7 @@ class notification extends \IPS\core\AdminNotification
 	{
         return \IPS\Theme::i()->getTemplate( 'notifications', 'antispambycleantalk' )->keyIsEmpty();
 	}
-	
+
 	/**
 	 * Severity
 	 *
@@ -107,7 +107,7 @@ class notification extends \IPS\core\AdminNotification
 	{
 		return static::SEVERITY_HIGH;
 	}
-	
+
 	/**
 	 * Dismissible?
 	 *
@@ -117,7 +117,7 @@ class notification extends \IPS\core\AdminNotification
 	{
 		return static::DISMISSIBLE_TEMPORARY;
 	}
-	
+
 	/**
 	 * Style
 	 *
@@ -136,7 +136,7 @@ class notification extends \IPS\core\AdminNotification
         }
 		return static::STYLE_ERROR;
 	}
-	
+
 	/**
 	 * Quick link from popup menu
 	 *
