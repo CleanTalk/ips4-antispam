@@ -1,0 +1,7 @@
+{
+    "Register": {
+        "type": "MemberListenerType",
+        "classname": "IPS\\antispambycleantalk\\listeners\\Register",
+        "extends": "IPS\\Member"
+    }
+}
