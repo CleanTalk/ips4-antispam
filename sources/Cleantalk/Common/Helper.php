@@ -833,6 +833,7 @@ class Helper
 	 */
 	static public function http__request($url, $data = array(), $presets = null, $opts = array())
 	{
+
 		if(function_exists('curl_init')){
 			
 			$ch = curl_init();
@@ -1356,7 +1357,21 @@ class Helper
      */
     private static function getSiteUrl()
     {
-        return ( isset( $_SERVER['HTTPS'] ) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'] . ( (isset( $_SERVER['SCRIPT_URL'] ) && strpos( $_SERVER['SCRIPT_URL'], '/admin' ) === false) ? $_SERVER['SCRIPT_URL'] : '' );
+		$baseUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://" . $_SERVER['HTTP_HOST'];
+        $sitePath = '/';
+
+        if (isset($_SERVER['SCRIPT_NAME'])) {
+            $scriptName = $_SERVER['SCRIPT_NAME'];
+            if (strpos($scriptName, '/admin/') !== false) {
+                $sitePath = substr($scriptName, 0, strpos($scriptName, '/admin/') + 1);
+            } elseif (strpos($scriptName, '/index.php') !== false) {
+                $sitePath = substr($scriptName, 0, strpos($scriptName, '/index.php') + 1);
+            } else {
+                $sitePath = substr($scriptName, 0, strrpos($scriptName, '/') + 1);
+            }
+        }
+
+        return $baseUrl . $sitePath;
     }
 
     /**
