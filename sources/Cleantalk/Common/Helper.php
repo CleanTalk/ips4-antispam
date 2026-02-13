@@ -373,10 +373,17 @@ class Helper
 	 */
 	static public function ip__validate($ip)
 	{
-		if(!$ip) return false; // NULL || FALSE || '' || so on...
-		if(filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) && $ip != '0.0.0.0') return 'v4';  // IPv4
-		if(filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) && self::ip__v6_reduce($ip) != '0::0') return 'v6';  // IPv6
-		return false; // Unknown
+		if ( !$ip ) { // NULL || FALSE || '' || so on...
+            return false;
+        }
+        if ( filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV4) && $ip != '0.0.0.0' ) { // IPv4
+            return 'v4';
+        }
+        if ( filter_var($ip, FILTER_VALIDATE_IP, FILTER_FLAG_IPV6) && self::ipV6Reduce($ip) != '0::0' ) { // IPv6
+            return 'v6';
+        }
+
+        return false; // Unknown
 	}
 
     /**
@@ -466,27 +473,72 @@ class Helper
 		if(self::ip__validate($ip)){
 			$url = array_search($ip, self::$cleantalks_servers);
 			return $url
-				? $url
+				? parse_url($url, PHP_URL_HOST)
 				: self::ip__resolve($ip);
 		}else
 			return $ip;
 	}
 	
 	/**
-	 * Get URL form IP
-	 *
-	 * @param $ip
-	 *
-	 * @return string
-	 */
+     * Resolve IP to hostname with FCrDNS (Forward-Confirmed reverse DNS) verification.
+     * Protects against PTR spoofing by verifying the hostname resolves back to the same IP.
+     *
+     * @param string $ip IP address to resolve
+     *
+     * @return string|false Verified hostname or false on failure
+     */
 	static public function ip__resolve($ip)
 	{
-		if(self::ip__validate($ip)){
-			$url = gethostbyaddr($ip);
-			if($url)
-				return $url;
-		}
-		return $ip;
+		// Validate IP first
+        $ip_version = self::ip__validate($ip);
+        if (!$ip_version) {
+            return false;
+        }
+
+        // Reverse DNS lookup (PTR record)
+        $hostname = gethostbyaddr($ip);
+
+        // If gethostbyaddr returns the IP itself, it means no PTR record exists
+        if (!$hostname || $hostname === $ip) {
+            return false;
+        }
+
+        // Forward DNS lookup - use dns_get_record() to support both IPv4 (A) and IPv6 (AAAA) records
+        $record_type = ($ip_version === 'v6') ? DNS_AAAA : DNS_A;
+        $ip_field = ($ip_version === 'v6') ? 'ipv6' : 'ip';
+
+        $records = @dns_get_record($hostname, $record_type);
+
+        // If forward lookup fails, we can't verify
+        if (empty($records)) {
+            return false;
+        }
+
+        // Extract IPs from DNS records
+        $forward_ips = array();
+        foreach ($records as $record) {
+            if (isset($record[$ip_field])) {
+                $forward_ips[] = $record[$ip_field];
+            }
+        }
+
+        if (empty($forward_ips)) {
+            return false;
+        }
+
+        // Check if the original IP is in the list of IPs the hostname resolves to
+        if ($ip_version === 'v6') {
+            $normalized_ip = self::ipV6Normalize($ip);
+            foreach ($forward_ips as $forward_ip) {
+                if (self::ipV6Normalize($forward_ip) === $normalized_ip) {
+                    return $hostname;
+                }
+            }
+        } elseif (in_array($ip, $forward_ips, true)) {
+            return $hostname;
+        }
+
+        return false;
 	}
 	
 	/**
