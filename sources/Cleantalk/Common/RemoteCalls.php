@@ -3,6 +3,8 @@
 namespace Cleantalk\Common;
 
 use Cleantalk\Common\Variables\Get;
+use Cleantalk\Common\Variables\Request;
+
 
 abstract class RemoteCalls
 {
@@ -31,18 +33,34 @@ abstract class RemoteCalls
     }
 
     /**
+     * @param $name
+     * @return mixed
+     * @psalm-taint-source input
+     */
+    public static function getVariable($name)
+    {
+        return Request::get($name);
+    }
+
+    /**
 	 * Checking if the current request is the Remote Call
 	 *
 	 * @return bool
 	 */
 	public static function check()
     {
-		return
-			Get::get( 'spbc_remote_call_token' ) &&
-			Get::get( 'spbc_remote_call_action' ) &&
-			Get::get( 'plugin_name' ) &&
-			in_array( Get::get( 'plugin_name' ), array( 'antispam','anti-spam', 'apbct' ) );
-	}
+        if (static::getVariable('spbc_remote_call_action')) {
+            static::getVariable('spbc_remote_call_token')
+            ? self::checkWithToken()
+            : false;
+        }
+        return false;
+    }
+
+    public static function checkWithToken()
+    {
+        return in_array(static::getVariable('plugin_name'), array('antispam', 'anti-spam', 'apbct'));
+    }
 
     /**
      * Execute corresponding method of RemoteCalls if exists
